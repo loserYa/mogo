@@ -1,0 +1,14 @@
+package com.loser.module.#<module>.service;
+
+import com.loser.core.sdk.MogoService;
+import com.loser.module.#<module>.entity.#<modelName>;
+
+/**
+ * #<modelDesc> 服务类
+ *
+ * @author #<author>
+ * @date #<genDate>
+ */
+public interface #<modelName>Service extends MogoService<#<idType>, #<modelName>> {
+
+}

@@ -1,0 +1,84 @@
+package com.loser.module.#<module>.handler;
+
+import com.loser.common.entity.APiResponsePage;
+import com.loser.common.entity.ApiResponse;
+import com.loser.common.utils.ParamsUtil;
+import com.loser.core.entity.Page;
+import com.loser.core.wrapper.LambdaQueryWrapper;
+import com.loser.core.wrapper.Wrappers;
+import com.loser.module.#<module>.entity.#<modelName>;
+import com.loser.module.#<module>.service.#<modelName>Service;
+import com.loser.module.#<module>.vo.req.#<modelName>PageReq;
+import com.loser.module.#<module>.vo.req.#<modelName>SaveReq;
+import com.loser.module.#<module>.vo.req.#<modelName>UpdateReq;
+import com.loser.module.#<module>.vo.resp.#<modelName>InfoResp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * 测试数据 处理器
+ *
+ * @author loser
+ * @date 2023-02-05  14:01
+ */
+@Component
+public class #<modelName>Handler {
+
+    @Autowired
+    private #<modelName>Service #<_modelName>Service;
+
+    /**
+     * 新增测试数据
+     */
+    public ApiResponse<Boolean> save(#<modelName>SaveReq req) {
+
+        ParamsUtil.checkNotNull(req);
+        #<modelName> save = ParamsUtil.copyProperties(req, #<modelName>.class);
+        return ApiResponse.ok(#<_modelName>Service.save(save));
+
+    }
+
+    /**
+     * 修改测试数据
+     */
+    public ApiResponse<Boolean> update(#<modelName>UpdateReq req) {
+
+        ParamsUtil.checkNotNull(req);
+        #<modelName> update = ParamsUtil.copyProperties(req, #<modelName>.class);
+        return ApiResponse.ok(#<_modelName>Service.updateById(update));
+
+    }
+
+    /**
+     * 通过id删除测试数据
+     */
+    public ApiResponse<Boolean> deleteById(#<idType> id) {
+
+        ParamsUtil.checkNotNull(id);
+        return ApiResponse.ok(#<_modelName>Service.removeById(id));
+
+    }
+
+    /**
+     * 通过id获取测试数据
+     */
+    public ApiResponse<#<modelName>InfoResp> getById(#<idType> id) {
+
+        ParamsUtil.checkNotNull(id);
+        #<modelName> dbData = #<_modelName>Service.getById(id);
+        return ApiResponse.ok(ParamsUtil.copyProperties(dbData, #<modelName>InfoResp.class));
+
+    }
+
+    /**
+     * 分页获取测试数据
+     */
+    public APiResponsePage<#<modelName>InfoResp, Object> queryList(#<modelName>PageReq req) {
+
+        LambdaQueryWrapper<#<modelName>> query = Wrappers.<#<modelName>>lambdaQuery();
+        Page<#<modelName>> page = #<_modelName>Service.page(query, req.getPageNo(), req.getPageSize());
+        return APiResponsePage.okPage(page, #<modelName>InfoResp.class);
+
+    }
+
+}

@@ -1,0 +1,19 @@
+package com.loser.module.#<module>.vo.req;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+
+/**
+ * #<modelDesc>更新请求参数
+ *
+ * @author #<author>
+ * @date #<genDate>
+ */
+@Data
+@ApiModel("#<modelDesc>更新请求参数")
+public class #<modelName>UpdateReq {
+
+forApi
+}

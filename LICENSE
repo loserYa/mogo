@@ -1,0 +1,17 @@
+# mogo-parent
+
+#### 介绍
+Mogo使用简单易懂的lambda操作mongoDb中的集合（Mogo名字乱敲的）
+
+mongoDb对于一般的常用软件来说应该都不陌生了，相信使用过MP(mybatisPlus)的小伙伴都知道lambda形式的操作是多么的爽了，但是mongoTemplate用起来确实很令人脑壳疼，所以脑袋一热就参考了mp做了一个类似的封装，让我自己远离恶心的Criteria，周末肝出来的出版，提供思想，希望有大佬带飞，期待有个好用的Mongo ORM
+
+
+#### 使用说明
+初期项目主要有三个模块：
+1.  mogo（基础的封装）
+2.  mogo-gen (提供的简单版代码生成器)
+3.  mogo-web (暴露出去的http测试模块)
+
+写法对比
+![和mongoTemplate的写法对比](https://foruda.gitee.com/images/1675599372979246902/a1822f4c_5198545.png "屏幕截图")
+![符合mp的lambda写法](https://foruda.gitee.com/images/1675599398243206516/5e4899a5_5198545.png "屏幕截图")

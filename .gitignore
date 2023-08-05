@@ -1,0 +1,7 @@
+# Project exclude paths
+/target/
+/.idea/
+/mogo-web/target/
+/mogo/target/
+/mogo-gen/target/
+/*/target
