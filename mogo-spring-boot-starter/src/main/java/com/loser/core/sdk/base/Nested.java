@@ -1,4 +1,3 @@
-
 package com.loser.core.sdk.base;
 
 import java.io.Serializable;
@@ -12,7 +11,6 @@ import java.util.function.Function;
  * @date 2023/2/4 22:44
  */
 public interface Nested<Param, LambdaQueryWrapper> extends Serializable {
-
     /**
      * 嵌套条件构造器
      *
@@ -28,7 +26,7 @@ public interface Nested<Param, LambdaQueryWrapper> extends Serializable {
      *
      * @return 当前条件构造器
      */
-    LambdaQueryWrapper or();
+    LambdaQueryWrapper or(Function<Param, Param> func);
 
     /**
      * 嵌套条件构造器
@@ -38,5 +36,12 @@ public interface Nested<Param, LambdaQueryWrapper> extends Serializable {
      * @return 当前条件构造器
      */
     LambdaQueryWrapper and(boolean condition, Function<Param, Param> func);
+
+    /**
+     * 嵌套条件构造器 使用or连接
+     *
+     * @return 当前条件构造器
+     */
+    LambdaQueryWrapper or(boolean condition, Function<Param, Param> func);
 
 }

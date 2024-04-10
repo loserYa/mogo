@@ -1,4 +1,3 @@
-
 package com.loser.core.wrapper;
 
 import com.loser.core.constant.ECompare;
@@ -14,7 +13,12 @@ import com.loser.core.sdk.base.Nested;
 import com.loser.utils.ConvertUtil;
 import com.loser.utils.ExceptionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -119,6 +123,11 @@ public class LambdaQueryWrapper<T>
 
 
     @Override
+    public LambdaQueryWrapper<T> or(Function<LambdaQueryWrapper<T>, LambdaQueryWrapper<T>> func) {
+        return or(true, func);
+    }
+
+    @Override
     public LambdaQueryWrapper<T> and(boolean condition, Function<LambdaQueryWrapper<T>, LambdaQueryWrapper<T>> func) {
 
         if (condition) {
@@ -136,22 +145,19 @@ public class LambdaQueryWrapper<T>
     }
 
     @Override
-    public LambdaQueryWrapper<T> or() {
+    public LambdaQueryWrapper<T> or(boolean condition, Function<LambdaQueryWrapper<T>, LambdaQueryWrapper<T>> func) {
 
-        if (conditions.size() == 0) {
-            throw ExceptionUtils.mpe("not first use or");
+        if (condition) {
+            LambdaQueryWrapper<T> apply = func.apply(new LambdaQueryWrapper<>());
+            ConditionWrapper conditionWrapper = apply.getCondition();
+            Condition c = new Condition();
+            c.setConditionType(EConditionType.OR);
+            c.setConditionWrapper(conditionWrapper);
+            conditions.add(c);
         }
-        Condition lastCondition = conditions.get(conditions.size() - 1);
-        ConditionWrapper conditionWrapper = lastCondition.getConditionWrapper();
-        if (Objects.isNull(conditionWrapper)) {
-            conditionWrapper = new ConditionWrapper(fields, conditions, sortConditions, skip, limit);
-        }
-        List<Condition> sub = conditionWrapper.getConditions();
-        Condition condition = sub.get(sub.size() - 1);
-        condition.setConditionType(EConditionType.OR);
         return this;
-
     }
+
 
     @Override
     public final LambdaQueryWrapper<T> orderByAsc(boolean condition, SFunction<T, ?> column) {

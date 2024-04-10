@@ -23,15 +23,12 @@ import java.util.stream.Collectors;
  * 查询工具构建工具
  *
  * @author loser
- * @date 2023-02-04  20:49
+ * @date 2023/6/13
  */
 public class QueryBuildUtils {
 
     private static final Map<ECompare, Function<Condition, Criteria>> HANDLERS = new ConcurrentHashMap<>();
 
-    /**
-     * 静态初始化不同类型的条件构建器
-     */
     static {
         HANDLERS.put(ECompare.EQ, QueryBuildUtils::eqHandle);
         HANDLERS.put(ECompare.NE, QueryBuildUtils::neHandle);
@@ -60,12 +57,19 @@ public class QueryBuildUtils {
      * @param arg 条件构建器封装的真实条件参数
      * @return 查询条件
      */
-    public static Query buildQuery(ConditionWrapper arg) {
+    private static Query buildQuery(ConditionWrapper arg) {
 
-        Criteria criteria = new Criteria();
         // 01 构建查询参数
-        criteria.andOperator(buildCondition(arg));
-        Query query = new Query(criteria);
+        Criteria[] build = buildCondition(arg);
+        Query query;
+        if (build.length == 1) {
+            query = new Query(build[0]);
+        } else {
+            Criteria criteria = new Criteria();
+            criteria.andOperator(build);
+            query = new Query(criteria);
+        }
+
         List<SortCondition> sortConditions = arg.getSortConditions();
 
         // 02 构建排序参数
@@ -115,48 +119,64 @@ public class QueryBuildUtils {
      * @param arg 条件构造器中的条件参数
      * @return 查询条件
      */
-    public static Criteria[] buildCondition(ConditionWrapper arg) {
+    private static Criteria[] buildCondition(ConditionWrapper arg) {
 
-        Criteria criteria = new Criteria();
         if (Objects.isNull(arg) || Objects.isNull(arg.getConditions()) || arg.getConditions().size() == 0) {
-            return new Criteria[]{criteria};
+            return new Criteria[]{new Criteria()};
         }
         List<Condition> conditions = arg.getConditions();
-
-        boolean isOr = false;
         Criteria[] critters = new Criteria[conditions.size()];
+
         for (int index = 0; index < conditions.size(); index++) {
+            Criteria curCriteria;
             Condition condition = conditions.get(index);
-            if (Objects.nonNull(condition.getConditionWrapper()) && Objects.isNull(condition.getCol()) && condition.getConditionWrapper().getConditions().size() > 0) {
-                Criteria curCriteria = new Criteria();
-                Condition first = condition.getConditionWrapper().getConditions().get(0);
-                if (first.getConditionType() == EConditionType.OR) {
-                    curCriteria.orOperator(buildCondition(condition.getConditionWrapper()));
-                } else {
-                    curCriteria.andOperator(buildCondition(condition.getConditionWrapper()));
-                }
-                critters[index] = curCriteria;
-                continue;
+            // 处理子集
+            if (Objects.nonNull(condition.getConditionWrapper())) {
+                curCriteria = buildSubCondition(condition);
+            } else {
+                curCriteria = buildCurCondition(condition);
             }
-            ECompare type = condition.getType();
-            if (condition.getConditionType() == EConditionType.OR) {
-                isOr = true;
-            }
-            Function<Condition, Criteria> handler = HANDLERS.get(type);
-            if (Objects.isNull(handler)) {
-                throw ExceptionUtils.mpe(String.format("buildQuery error not have queryType %s", type));
-            }
-            Criteria curCriteria = handler.apply(condition);
             critters[index] = curCriteria;
         }
-        if (critters.length > 0) {
-            if (isOr) {
-                criteria.orOperator(critters);
+
+        return critters;
+
+    }
+
+    private static Criteria buildCurCondition(Condition condition) {
+
+        ECompare type = condition.getType();
+        Criteria curCriteria;
+        Function<Condition, Criteria> handler = HANDLERS.get(type);
+        if (Objects.isNull(handler)) {
+            throw ExceptionUtils.mpe(String.format("buildQuery error not have queryType %s", type));
+        }
+        curCriteria = handler.apply(condition);
+        return curCriteria;
+
+    }
+
+    private static Criteria buildSubCondition(Condition condition) {
+
+        Criteria curCriteria;
+        curCriteria = new Criteria();
+        ConditionWrapper conditionWrapper = condition.getConditionWrapper();
+        Criteria[] criteria = buildCondition(conditionWrapper);
+        boolean single = criteria.length == 1;
+        if (condition.getConditionType().equals(EConditionType.OR)) {
+            if (single) {
+                curCriteria.orOperator(criteria[0]);
             } else {
-                criteria.andOperator(critters);
+                curCriteria.orOperator(criteria);
+            }
+        } else {
+            if (single) {
+                curCriteria.andOperator(criteria[0]);
+            } else {
+                curCriteria.andOperator(criteria);
             }
         }
-        return critters;
+        return curCriteria;
 
     }
 
@@ -249,7 +269,6 @@ public class QueryBuildUtils {
      */
     private static Criteria ninHandle(Condition condition) {
         List<Object> args = (List<Object>) condition.getArgs().get(0);
-        return Criteria.where(condition.getCol()).nin(args);
+        return Criteria.where(condition.getCol()).nin(args.toArray());
     }
-
 }
