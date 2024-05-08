@@ -1,23 +1,13 @@
-package com.loser.core.sdk;
+package com.loser.core.sdk.mapper;
 
 import com.loser.core.entity.Page;
-import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * mongo 基础方法接口
- *
- * @author loser
- * @date 2023-02-04  18:52
- */
-public interface MogoService<I extends Serializable, T> {
-
-
-    BaseMapper<I, T> getMapper();
+public interface BaseMapper<I extends Serializable, T> {
 
     /**
      * 查询单条数据
@@ -124,6 +114,6 @@ public interface MogoService<I extends Serializable, T> {
      * @param queryWrapper 条件构建器
      * @return 是否存在数据
      */
-    boolean exist(LambdaQueryWrapper<T> queryWrapper);
 
+    boolean exist(LambdaQueryWrapper<T> queryWrapper);
 }
