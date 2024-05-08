@@ -25,4 +25,6 @@ public class User {
 
     private Long updateTime;
 
+    private String logicDel;
+
 }

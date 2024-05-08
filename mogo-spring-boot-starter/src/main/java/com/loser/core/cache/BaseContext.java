@@ -1,7 +1,7 @@
 package com.loser.core.cache;
 
+import com.loser.core.proxy.factory.MapperFactory;
 import com.loser.core.sdk.mapper.BaseMapper;
-import com.loser.core.sdk.mapper.DefaultBaseMapper;
 import com.loser.utils.SpringContextUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -28,11 +28,11 @@ public class BaseContext {
                 if (Objects.nonNull(baseMapper)) {
                     return baseMapper;
                 }
-                DefaultBaseMapper handler;
+                BaseMapper handler;
                 if (Objects.isNull(mongoTemplate)) {
-                    handler = new DefaultBaseMapper<>(SpringContextUtil.getBean(MongoTemplate.class), clazz);
+                    handler = MapperFactory.getMapper(SpringContextUtil.getBean(MongoTemplate.class), clazz);
                 } else {
-                    handler = new DefaultBaseMapper<>(mongoTemplate, clazz);
+                    handler = MapperFactory.getMapper(mongoTemplate, clazz);
                 }
                 mapper.put(clazz, handler);
                 return handler;

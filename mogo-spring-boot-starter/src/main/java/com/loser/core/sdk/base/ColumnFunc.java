@@ -1,7 +1,5 @@
 package com.loser.core.sdk.base;
 
-import com.loser.core.sdk.SFunction;
-
 import java.io.Serializable;
 
 /**
@@ -10,7 +8,7 @@ import java.io.Serializable;
  * @author loser
  * @date 2023/2/4 21:09
  */
-public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends Serializable {
+public interface ColumnFunc<T, LambdaQueryWrapper> extends Serializable {
 
     /**
      * 升序 排序接口
@@ -18,7 +16,7 @@ public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends 
      * @param column 参与排序的列
      * @return 当前构建器
      */
-    default LambdaQueryWrapper orderByAsc(R column) {
+    default LambdaQueryWrapper orderByAsc(String column) {
         return orderByAsc(true, column);
     }
 
@@ -28,7 +26,7 @@ public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends 
      * @param column 参与排序的列
      * @return 当前构建器
      */
-    default LambdaQueryWrapper orderByDesc(R column) {
+    default LambdaQueryWrapper orderByDesc(String column) {
         return orderByDesc(true, column);
     }
 
@@ -39,7 +37,7 @@ public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends 
      * @param column    参与排序的列
      * @return 当前构建器
      */
-    LambdaQueryWrapper orderByAsc(boolean condition, R column);
+    LambdaQueryWrapper orderByAsc(boolean condition, String column);
 
     /**
      * 降序 排序接口
@@ -48,7 +46,7 @@ public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends 
      * @param column    参与排序的列
      * @return 当前构建器
      */
-    LambdaQueryWrapper orderByDesc(boolean condition, R column);
+    LambdaQueryWrapper orderByDesc(boolean condition, String column);
 
     /**
      * 需要查询的列,不设置默认查询全部
@@ -56,6 +54,6 @@ public interface Func<T, LambdaQueryWrapper, R extends SFunction<T, ?>> extends 
      * @param columns 查询的列
      * @return 当前构建器
      */
-    LambdaQueryWrapper select(R... columns);
+    LambdaQueryWrapper select(String... columns);
 
 }

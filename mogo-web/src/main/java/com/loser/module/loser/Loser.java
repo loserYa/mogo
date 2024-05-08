@@ -25,4 +25,6 @@ public class Loser {
 
     private Long updateTime;
 
+    private String logicDel;
+
 }

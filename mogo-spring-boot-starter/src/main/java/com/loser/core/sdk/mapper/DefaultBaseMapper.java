@@ -174,4 +174,9 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         return mongoTemplate;
     }
 
+    @Override
+    public Class<T> getTragetClass() {
+        return targetClass;
+    }
+
 }

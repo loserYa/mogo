@@ -38,4 +38,41 @@ public class StringUtils {
         }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
+
+    /**
+     * @param str 字符串
+     * @return 是否不空
+     */
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
+    }
+
+    /**
+     * @param str 字符串
+     * @return 是否为空
+     */
+    public static boolean isBlank(String str) {
+        if (str == null) {
+            return true;
+        }
+        if (str.equals("null")) {
+            return true;
+        }
+        int len = str.length();
+        if (len == 0) {
+            return true;
+        }
+        for (int i = 0; i < len; i++) {
+            switch (str.charAt(i)) {
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return true;
+    }
 }
