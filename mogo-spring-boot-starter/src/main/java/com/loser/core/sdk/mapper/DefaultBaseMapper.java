@@ -169,4 +169,9 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         return mongoTemplate.exists(query, targetClass);
     }
 
+    @Override
+    public MongoTemplate getTemplate() {
+        return mongoTemplate;
+    }
+
 }

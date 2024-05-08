@@ -2,6 +2,7 @@ package com.loser.core.sdk.mapper;
 
 import com.loser.core.entity.Page;
 import com.loser.core.wrapper.LambdaQueryWrapper;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -116,4 +117,7 @@ public interface BaseMapper<I extends Serializable, T> {
      */
 
     boolean exist(LambdaQueryWrapper<T> queryWrapper);
+
+    MongoTemplate getTemplate();
+
 }

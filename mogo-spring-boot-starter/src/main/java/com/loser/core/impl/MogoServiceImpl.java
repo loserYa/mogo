@@ -4,7 +4,6 @@ import com.loser.core.cache.BaseContext;
 import com.loser.core.entity.Page;
 import com.loser.core.sdk.MogoService;
 import com.loser.core.sdk.mapper.BaseMapper;
-import com.loser.core.sdk.mapper.DefaultBaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
 import com.loser.utils.ClassUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -36,13 +35,17 @@ public class MogoServiceImpl<I extends Serializable, T> implements MogoService<I
 
     @PostConstruct
     public void init() {
-        this.baseMapper = new DefaultBaseMapper<>(mongoTemplate, targetClass);
-        BaseContext.register(targetClass, baseMapper);
+        this.baseMapper = BaseContext.getMapper(targetClass, mongoTemplate);
     }
 
     @Override
     public BaseMapper<I, T> getMapper() {
         return baseMapper;
+    }
+
+    @Override
+    public MongoTemplate getTemplate() {
+        return baseMapper.getTemplate();
     }
 
     @Override

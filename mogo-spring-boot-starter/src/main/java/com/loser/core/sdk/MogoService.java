@@ -3,6 +3,7 @@ package com.loser.core.sdk;
 import com.loser.core.entity.Page;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -18,6 +19,8 @@ public interface MogoService<I extends Serializable, T> {
 
 
     BaseMapper<I, T> getMapper();
+
+    MongoTemplate getTemplate();
 
     /**
      * 查询单条数据
