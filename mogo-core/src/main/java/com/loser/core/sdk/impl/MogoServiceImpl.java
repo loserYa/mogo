@@ -126,18 +126,19 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     @Override
     public Object getObject() {
-        Class<? extends MogoServiceImpl> aClass = this.getClass();
+
+        Class<?> aClass = getObjectType();
         boolean exist = AnnotationUtil.isExistMethodAndFunction(aClass, MongoDs.class);
         if (exist) {
             return Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), new ServiceDataSourceProxy(this));
         }
         return this;
+
     }
 
     @Override
     public Class<?> getObjectType() {
-        Class<? extends MogoServiceImpl> aClass = this.getClass();
-        return aClass;
+        return this.getClass();
     }
 
 }

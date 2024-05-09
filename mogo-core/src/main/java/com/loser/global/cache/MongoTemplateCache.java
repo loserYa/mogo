@@ -49,4 +49,14 @@ public class MongoTemplateCache {
         return mongoTemplate;
     }
 
+    public static MongoTemplate getMaster() {
+
+        MongoTemplate mongoTemplate = CACHE.get(MogoConstant.MASTER_DS);
+        if (Objects.isNull(mongoTemplate)) {
+            throw ExceptionUtils.mpe(String.format("ds: %s mongoTemplate un exist", MogoConstant.MASTER_DS));
+        }
+        return mongoTemplate;
+
+    }
+
 }

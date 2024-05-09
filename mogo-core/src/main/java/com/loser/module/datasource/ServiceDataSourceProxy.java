@@ -1,7 +1,9 @@
 package com.loser.module.datasource;
 
 import com.loser.core.sdk.MogoService;
+import com.loser.global.cache.MethodDsCache;
 import com.loser.global.cache.MongoTemplateCache;
+import com.loser.utils.StringUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -25,14 +27,15 @@ public class ServiceDataSourceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        MongoDs annotation = target.getClass().getMethod(method.getName(), method.getParameterTypes()).getAnnotation(MongoDs.class);
-        if (Objects.isNull(annotation)) {
-            annotation = target.getClass().getAnnotation(MongoDs.class);
+        String key = method.getDeclaringClass().getName() + "." + method.getName();
+        String value = MethodDsCache.CACHE.get(key);
+        if (Objects.isNull(value)) {
+            value = getByAnnotation(method, key);
         }
-        boolean notNull = Objects.nonNull(annotation);
+        boolean notNull = StringUtils.isNotBlank(value);
         try {
             if (notNull) {
-                MongoTemplateCache.setDataSource(annotation.value());
+                MongoTemplateCache.setDataSource(value);
             }
             return method.invoke(target, args);
         } finally {
@@ -40,6 +43,19 @@ public class ServiceDataSourceProxy implements InvocationHandler {
                 MongoTemplateCache.clear();
             }
         }
+
+    }
+
+    private String getByAnnotation(Method method, String key) throws NoSuchMethodException {
+
+        String value;
+        MongoDs annotation = target.getClass().getMethod(method.getName(), method.getParameterTypes()).getAnnotation(MongoDs.class);
+        if (Objects.isNull(annotation)) {
+            annotation = target.getClass().getAnnotation(MongoDs.class);
+        }
+        value = Objects.isNull(annotation) ? "" : annotation.value();
+        MethodDsCache.CACHE.put(key, value);
+        return value;
 
     }
 

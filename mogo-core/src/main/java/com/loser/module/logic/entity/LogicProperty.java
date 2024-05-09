@@ -1,11 +1,11 @@
 package com.loser.module.logic.entity;
 
 /**
- * @author JiaChaoYang
- * @project mongo-plus
- * @description
- * @date 2023-02-23 10:42
- **/
+ * 逻辑删除配置
+ *
+ * @author loser
+ * @date 2024/5/10
+ */
 public class LogicProperty {
 
     /**
