@@ -1,6 +1,9 @@
 package com.loser.config;
 
 import com.loser.hardcode.constant.MogoConstant;
+import com.loser.properties.MogoDataSourceProperties;
+import com.loser.properties.MogoLogicProperties;
+import com.loser.properties.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;

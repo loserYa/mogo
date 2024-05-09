@@ -1,4 +1,4 @@
-package com.loser.config;
+package com.loser.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -17,4 +17,5 @@ public class MogoDataSourceProperties {
     public void setDatasource(Map<String, MongoProperties> datasource) {
         this.datasource = datasource;
     }
+
 }

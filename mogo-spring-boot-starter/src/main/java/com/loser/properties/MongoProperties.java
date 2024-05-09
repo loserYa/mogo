@@ -1,4 +1,4 @@
-package com.loser.config;
+package com.loser.properties;
 
 import com.mongodb.ConnectionString;
 import org.bson.UuidRepresentation;
