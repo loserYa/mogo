@@ -3,7 +3,6 @@ package com.loser.core.entity;
 import com.loser.core.constant.ECompare;
 import com.loser.core.constant.EConditionType;
 import com.loser.core.wrapper.ConditionWrapper;
-import lombok.Data;
 
 import java.util.List;
 
@@ -13,7 +12,6 @@ import java.util.List;
  * @author loser
  * @date 2023-02-04  17:07
  */
-@Data
 public class Condition {
 
     public Condition() {
@@ -50,4 +48,43 @@ public class Condition {
      */
     private ConditionWrapper conditionWrapper;
 
+    public EConditionType getConditionType() {
+        return conditionType;
+    }
+
+    public void setConditionType(EConditionType conditionType) {
+        this.conditionType = conditionType;
+    }
+
+    public ECompare getType() {
+        return type;
+    }
+
+    public void setType(ECompare type) {
+        this.type = type;
+    }
+
+    public String getCol() {
+        return col;
+    }
+
+    public void setCol(String col) {
+        this.col = col;
+    }
+
+    public List<Object> getArgs() {
+        return args;
+    }
+
+    public void setArgs(List<Object> args) {
+        this.args = args;
+    }
+
+    public ConditionWrapper getConditionWrapper() {
+        return conditionWrapper;
+    }
+
+    public void setConditionWrapper(ConditionWrapper conditionWrapper) {
+        this.conditionWrapper = conditionWrapper;
+    }
 }

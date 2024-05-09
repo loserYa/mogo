@@ -1,9 +1,6 @@
 package com.loser.core.entity;
 
 import com.loser.core.constant.ESortType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * 排序字段
@@ -11,10 +8,15 @@ import lombok.NoArgsConstructor;
  * @author loser
  * @date 2023-02-04  17:07
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class SortCondition {
+
+    public SortCondition() {
+    }
+
+    public SortCondition(ESortType sortType, String col) {
+        this.sortType = sortType;
+        this.col = col;
+    }
 
     /**
      * 排序类型
@@ -26,4 +28,19 @@ public class SortCondition {
      */
     private String col;
 
+    public ESortType getSortType() {
+        return sortType;
+    }
+
+    public void setSortType(ESortType sortType) {
+        this.sortType = sortType;
+    }
+
+    public String getCol() {
+        return col;
+    }
+
+    public void setCol(String col) {
+        this.col = col;
+    }
 }

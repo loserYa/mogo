@@ -1,7 +1,5 @@
-
 package com.loser.core.entity;
 
-import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +11,6 @@ import java.util.List;
  * @author loser
  * @date 2023/2/5 2:24
  */
-@Data
 public class Page<T> {
 
     /**
@@ -36,4 +33,35 @@ public class Page<T> {
      */
     private int pageNum = 1;
 
+    public List<T> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<T> records) {
+        this.records = records;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
+    public void setTotal(long total) {
+        this.total = total;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public int getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
 }
