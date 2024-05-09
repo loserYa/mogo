@@ -26,7 +26,7 @@ public class LogicAutoFillInterceptor implements Interceptor {
             return build(entity);
         }
         try {
-            Field field = entity.getClass().getDeclaredField(result.getColumn());
+            Field field = entity.getClass().getDeclaredField(result.getFiled());
             field.setAccessible(true);
             field.set(entity, result.getLogicNotDeleteValue());
         } catch (Exception e) {
@@ -47,7 +47,7 @@ public class LogicAutoFillInterceptor implements Interceptor {
         for (Object entity : entityList) {
             try {
                 if (Objects.isNull(field)) {
-                    field = entity.getClass().getDeclaredField(result.getColumn());
+                    field = entity.getClass().getDeclaredField(result.getFiled());
                     field.setAccessible(true);
                 }
                 field.set(entity, result.getLogicNotDeleteValue());

@@ -3,6 +3,7 @@ package com.loser.core.logic.replacer;
 
 import com.loser.core.cache.global.CollectionLogicDeleteCache;
 import com.loser.core.constant.ExecuteMethodEnum;
+import com.loser.core.constant.MogoConstant;
 import com.loser.core.logic.entity.LogicDeleteResult;
 import com.loser.core.replacer.Replacer;
 import com.loser.core.wrapper.LambdaQueryWrapper;
@@ -29,9 +30,9 @@ public class LogicRemoveByIdReplacer implements Replacer {
             return method.invoke(target, args);
         }
         Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
-        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq("_id", args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
+        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq(MogoConstant.ID, args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
         Object entity = clazz.newInstance();
-        Field field = entity.getClass().getDeclaredField(result.getColumn());
+        Field field = entity.getClass().getDeclaredField(result.getFiled());
         field.setAccessible(true);
         field.set(entity, result.getLogicDeleteValue());
         return newMethod.invoke(target, build(entity, query));

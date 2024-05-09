@@ -56,7 +56,9 @@ public class MapperFactory {
             }
             LogicDeleteResult result = new LogicDeleteResult();
             Field field = targetInfo.getField();
-            String column = field.getName();
+            org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
+            String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
+            result.setFiled(field.getName());
             result.setColumn(column);
             result.setLogicDeleteValue(StringUtils.isNotBlank(annotation.delval()) ? annotation.delval() : logicProperty.getLogicDeleteValue());
             result.setLogicNotDeleteValue(StringUtils.isNotBlank(annotation.value()) ? annotation.value() : logicProperty.getLogicNotDeleteValue());
@@ -70,6 +72,7 @@ public class MapperFactory {
                 && StringUtils.isNotBlank(logicProperty.getLogicNotDeleteValue())) {
             LogicDeleteResult result = new LogicDeleteResult();
             result.setColumn(logicProperty.getLogicDeleteField());
+            result.setFiled(logicProperty.getLogicDeleteField());
             result.setLogicDeleteValue(logicProperty.getLogicDeleteValue());
             result.setLogicNotDeleteValue(logicProperty.getLogicNotDeleteValue());
             logicDeleteResultHashMap.put(clazz, result);

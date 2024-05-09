@@ -3,6 +3,7 @@ package com.loser.core.logic.replacer;
 
 import com.loser.core.cache.global.CollectionLogicDeleteCache;
 import com.loser.core.constant.ExecuteMethodEnum;
+import com.loser.core.constant.MogoConstant;
 import com.loser.core.logic.entity.LogicDeleteResult;
 import com.loser.core.replacer.Replacer;
 import com.loser.core.wrapper.LambdaQueryWrapper;
@@ -29,7 +30,7 @@ public class LogicListByIdsReplacer implements Replacer {
             return method.invoke(target, args);
         }
         Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.LIST.getMethod(), LambdaQueryWrapper.class);
-        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().in("_id", (Collection<Object>) args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
+        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().in(MogoConstant.ID, (Collection<Object>) args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
         return newMethod.invoke(target, build(query));
 
     }

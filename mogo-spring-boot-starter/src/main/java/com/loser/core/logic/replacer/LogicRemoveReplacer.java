@@ -29,7 +29,7 @@ public class LogicRemoveReplacer implements Replacer {
         }
         Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
         Object entity = clazz.newInstance();
-        Field field = entity.getClass().getDeclaredField(result.getColumn());
+        Field field = entity.getClass().getDeclaredField(result.getFiled());
         field.setAccessible(true);
         field.set(entity, result.getLogicDeleteValue());
         return newMethod.invoke(target, build(entity, args[0]));

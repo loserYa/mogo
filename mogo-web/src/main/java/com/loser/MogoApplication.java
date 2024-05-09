@@ -4,7 +4,6 @@ import com.loser.core.cache.BaseContext;
 import com.loser.core.config.MogoConfiguration;
 import com.loser.core.logic.entity.LogicProperty;
 import com.loser.core.sdk.mapper.BaseMapper;
-import com.loser.core.wrapper.Wrappers;
 import com.loser.module.loser.Loser;
 import com.loser.module.user.entity.User;
 import com.loser.module.user.service.UserService;
@@ -42,23 +41,24 @@ public class MogoApplication {
         BaseMapper<Long, User> userMapper = BaseContext.getMapper(Long.class, User.class);
         BaseMapper<Long, Loser> mapper1 = BaseContext.getMapper(Long.class, Loser.class);
         BaseMapper<Long, Loser> mapper2 = BaseContext.getMapper(Long.class, Loser.class);
-//        Loser loser = new Loser();
-//        loser.setId(System.currentTimeMillis());
-//        loser.setLoginName("loser");
-//        loser.setPassWord("loser");
-//        loser.setAge(10);
-//        loser.setCreateTime(System.currentTimeMillis());
-//        loser.setUpdateTime(System.currentTimeMillis());
-//        mapper1.save(loser);
-        mapper2.getOne(Wrappers.<Loser>lambdaQuery().eq(Loser::getId, 1715187919793L));
-//        Loser byId = mapper1.getById(1715187919793L);
-//        System.out.println(byId);
-        for (long i = 0; i < 100; i++) {
-            long start = System.currentTimeMillis();
-            mapper1.removeById(i);
-            System.out.println(System.currentTimeMillis() - start);
-        }
-
+        Loser loser = new Loser();
+        loser.setId(System.currentTimeMillis());
+        loser.setLoginName("loser");
+        loser.setPassWord("loser");
+        loser.setAge(10);
+        loser.setCreateTime(System.currentTimeMillis());
+        loser.setUpdateTime(System.currentTimeMillis());
+        mapper1.save(loser);
+//        mapper2.getOne(Wrappers.<Loser>lambdaQuery().eq(Loser::getId, 1715187919793L));
+////        Loser byId = mapper1.getById(1715187919793L);
+////        System.out.println(byId);
+//        for (long i = 0; i < 100; i++) {
+//            long start = System.currentTimeMillis();
+//            mapper1.removeById(i);
+//            System.out.println(System.currentTimeMillis() - start);
+//        }
+        Loser byId = mapper1.getById(1715249422667L);
+        System.out.println(byId);
     }
 
 }

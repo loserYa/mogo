@@ -1,5 +1,6 @@
 package com.loser.core.sdk.mapper;
 
+import com.loser.core.constant.MogoConstant;
 import com.loser.core.entity.Page;
 import com.loser.core.wrapper.LambdaQueryWrapper;
 import com.loser.utils.ClassUtil;
@@ -53,7 +54,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public boolean removeById(I id) {
 
-        Criteria criteria = Criteria.where("_id").is(id);
+        Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
         Query query = new Query(criteria);
         DeleteResult deleteResult = mongoTemplate.remove(query, targetClass);
         return deleteResult.getDeletedCount() > 0;
@@ -72,7 +73,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public boolean updateById(T entity) {
 
-        Criteria criteria = Criteria.where("_id").is(ClassUtil.getId(entity));
+        Criteria criteria = Criteria.where(MogoConstant.ID).is(ClassUtil.getId(entity));
         Query query = new Query(criteria);
         Update update = getUpdate(entity);
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, targetClass);
@@ -113,7 +114,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public T getById(I id) {
 
-        Criteria criteria = Criteria.where("_id").is(id);
+        Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
         Query query = new Query(criteria);
         return mongoTemplate.findOne(query, targetClass);
 
@@ -122,7 +123,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public Collection<T> listByIds(Collection<I> idList) {
 
-        Criteria criteria = Criteria.where("_id").in(idList);
+        Criteria criteria = Criteria.where(MogoConstant.ID).in(idList);
         Query query = new Query(criteria);
         return mongoTemplate.find(query, targetClass);
 

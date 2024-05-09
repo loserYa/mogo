@@ -14,6 +14,11 @@ public class LogicDeleteResult {
     private String column;
 
     /**
+     * 对应实体字段
+     */
+    private String filed;
+
+    /**
      * 逻辑删除全局值（默认 1、表示已删除）
      */
     private String logicDeleteValue = "1";
@@ -45,5 +50,13 @@ public class LogicDeleteResult {
 
     public void setLogicNotDeleteValue(String logicNotDeleteValue) {
         this.logicNotDeleteValue = logicNotDeleteValue;
+    }
+
+    public String getFiled() {
+        return filed;
+    }
+
+    public void setFiled(String filed) {
+        this.filed = filed;
     }
 }
