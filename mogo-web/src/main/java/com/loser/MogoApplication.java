@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import java.util.Collection;
+import java.util.Map;
 
 @SpringBootConfiguration
 @SpringBootApplication
@@ -22,9 +22,9 @@ public class MogoApplication {
         ConfigurableApplicationContext context = SpringApplication.run(MogoApplication.class, args);
         UserService userService = context.getBean(UserService.class);
         UserService userService1 = context.getBean(UserService.class);
-        Collection<MongoTemplate> values = MongoTemplateCache.CACHE.values();
+        Map<String, MongoTemplate> cache = MongoTemplateCache.CACHE;
         MongoTemplate mongoTemplate = context.getBean(MongoTemplate.class);
-        System.out.println("values = " + values);
+        System.out.println("values = " + cache);
         BaseMapper<Long, User> mapper = userService.getMapper();
 //        BaseMapper<Long, User> userMapper = BaseContext.getMapper(Long.class, User.class);
 //        BaseMapper<Long, Loser> mapper1 = BaseContext.getMapper(Long.class, Loser.class);
@@ -53,7 +53,6 @@ public class MogoApplication {
         user.setAge(0);
         user.setCreateTime(0L);
         user.setUpdateTime(0L);
-        user.setLogicDel("");
         userService.save(user);
 
         User byId = userService.getById(1715249422667L);
