@@ -1,11 +1,13 @@
 package com.loser.global.cache;
 
 import com.loser.hardcode.constant.MogoConstant;
+import com.loser.utils.ExceptionUtils;
 import com.loser.utils.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 缓存多个数据源信息
@@ -35,6 +37,16 @@ public class MongoTemplateCache {
 
     public static void clear() {
         dataSource.remove();
+    }
+
+    public static MongoTemplate getMongoTemplate() {
+
+        String ds = getDataSource();
+        MongoTemplate mongoTemplate = CACHE.get(ds);
+        if (Objects.isNull(mongoTemplate)) {
+            throw ExceptionUtils.mpe(String.format("ds: %s mongoTemplate un exist", ds));
+        }
+        return mongoTemplate;
     }
 
 }

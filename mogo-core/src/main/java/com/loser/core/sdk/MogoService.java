@@ -1,5 +1,6 @@
 package com.loser.core.sdk;
 
+import com.loser.config.MogoConfiguration;
 import com.loser.core.entity.Page;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
@@ -17,10 +18,11 @@ import java.util.List;
  */
 public interface MogoService<I extends Serializable, T> {
 
-
     BaseMapper<I, T> getMapper();
 
     MongoTemplate getTemplate();
+
+    MogoConfiguration getConfiguration();
 
     /**
      * 查询单条数据

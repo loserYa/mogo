@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * @date 2023-02-05  13:58
  */
 @Service
-@MongoDs("loser")
+@MongoDs("slave_1")
 public class UserServiceImpl extends MogoServiceImpl<Long, User> implements UserService {
 
     @Override

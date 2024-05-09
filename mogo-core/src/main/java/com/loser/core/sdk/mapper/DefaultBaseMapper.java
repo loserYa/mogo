@@ -170,7 +170,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
     @Override
     public MongoTemplate getTemplate() {
-        return MongoTemplateCache.CACHE.get(MongoTemplateCache.getDataSource());
+        return MongoTemplateCache.getMongoTemplate();
     }
 
     @Override

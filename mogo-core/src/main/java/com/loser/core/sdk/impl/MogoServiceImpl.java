@@ -1,5 +1,6 @@
 package com.loser.core.sdk.impl;
 
+import com.loser.config.MogoConfiguration;
 import com.loser.core.entity.Page;
 import com.loser.core.sdk.MogoService;
 import com.loser.core.sdk.mapper.BaseMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -34,9 +36,17 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     protected BaseMapper<I, T> baseMapper;
 
+    @Resource
+    protected MogoConfiguration mogoConfiguration;
+
     @PostConstruct
     public void init() {
         this.baseMapper = BaseMapperContext.getMapper(targetClass);
+    }
+
+    @Override
+    public MogoConfiguration getConfiguration() {
+        return mogoConfiguration;
     }
 
     @Override
