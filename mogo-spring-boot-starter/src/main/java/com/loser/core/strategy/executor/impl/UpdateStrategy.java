@@ -14,7 +14,7 @@ public class UpdateStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.update(args[0], (LambdaQueryWrapper) args[1], clazz));
+        replace(args, interceptor.update(args[0], (LambdaQueryWrapper<?>) args[1], clazz));
     }
 
 }

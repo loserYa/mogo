@@ -14,7 +14,7 @@ public class GetOneStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.getOne((LambdaQueryWrapper) args[0], clazz));
+        replace(args, interceptor.getOne((LambdaQueryWrapper<?>) args[0], clazz));
     }
 
 }

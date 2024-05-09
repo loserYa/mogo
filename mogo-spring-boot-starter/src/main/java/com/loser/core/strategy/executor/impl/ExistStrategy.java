@@ -14,7 +14,7 @@ public class ExistStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.exist((LambdaQueryWrapper) args[0], clazz));
+        replace(args, interceptor.exist((LambdaQueryWrapper<?>) args[0], clazz));
     }
 
 }

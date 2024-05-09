@@ -11,12 +11,12 @@ public class LogicProperty {
     /**
      * 是否开启逻辑删除功能
      */
-    private Boolean open = true;
+    private Boolean open = false;
 
     /**
      * 是否开启基于拦截器的逻辑删除字段填充（建议方案：使用数据库默认字段 > 其次是手动设置 > 框架自带拦截器 > 自定义拦截器）
      */
-    private Boolean autoFill = true;
+    private Boolean autoFill = false;
 
     /**
      * 逻辑删除全局属性名

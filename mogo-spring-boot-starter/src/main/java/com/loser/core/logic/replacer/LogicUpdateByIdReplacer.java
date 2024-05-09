@@ -28,7 +28,7 @@ public class LogicUpdateByIdReplacer implements Replacer {
         if (Objects.isNull(result)) {
             return method.invoke(target, args);
         }
-        Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), LambdaQueryWrapper.class);
+        Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
         LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq("_id", ClassUtil.getId(args[0])).eq(result.getColumn(), result.getLogicNotDeleteValue());
         return newMethod.invoke(target, build(args[0], query));
 

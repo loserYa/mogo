@@ -14,7 +14,7 @@ public class ListStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.list((LambdaQueryWrapper) args[0], clazz));
+        replace(args, interceptor.list((LambdaQueryWrapper<?>) args[0], clazz));
     }
 
 }

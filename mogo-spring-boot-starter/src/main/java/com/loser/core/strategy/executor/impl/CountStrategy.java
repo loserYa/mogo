@@ -14,7 +14,7 @@ public class CountStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.count((LambdaQueryWrapper) args[0], clazz));
+        replace(args, interceptor.count((LambdaQueryWrapper<?>) args[0], clazz));
     }
 
 }

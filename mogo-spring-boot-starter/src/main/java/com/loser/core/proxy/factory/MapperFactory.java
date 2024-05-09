@@ -2,6 +2,7 @@ package com.loser.core.proxy.factory;
 
 import com.loser.core.anno.CollectionLogic;
 import com.loser.core.cache.global.CollectionLogicDeleteCache;
+import com.loser.core.config.MogoConfiguration;
 import com.loser.core.logic.AnnotationHandler;
 import com.loser.core.logic.entity.ClassAnnotationFiled;
 import com.loser.core.logic.entity.LogicDeleteResult;
@@ -17,6 +18,12 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * BaseMapper 工厂
+ *
+ * @author loser
+ * @date 2024/5/9
+ */
 public class MapperFactory {
 
     @SuppressWarnings("all")
@@ -31,13 +38,15 @@ public class MapperFactory {
 
     private static void mapper(Class<?> clazz) {
 
+        if (!CollectionLogicDeleteCache.open) {
+            return;
+        }
         Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = CollectionLogicDeleteCache.logicDeleteResultHashMap;
         if (logicDeleteResultHashMap.containsKey(clazz)) {
             return;
         }
         ClassAnnotationFiled<CollectionLogic> targetInfo = AnnotationHandler.getAnnotationOnFiled(clazz, CollectionLogic.class);
-        // todo loser
-        LogicProperty logicProperty = new LogicProperty();
+        LogicProperty logicProperty = MogoConfiguration.instance().getLogicProperty();
         // 优先使用每个对象自定义规则
         if (Objects.nonNull(targetInfo)) {
             CollectionLogic annotation = targetInfo.getTargetAnnotation();

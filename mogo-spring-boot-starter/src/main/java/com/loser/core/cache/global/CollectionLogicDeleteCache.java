@@ -2,7 +2,6 @@ package com.loser.core.cache.global;
 
 
 import com.loser.core.logic.entity.LogicDeleteResult;
-import com.loser.core.logic.entity.LogicProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +17,7 @@ public class CollectionLogicDeleteCache {
     /**
      * 是否开启逻辑删除功能
      */
-    public static Boolean open = true;
-
-    /**
-     * 逻辑删除配置
-     */
-    public static LogicProperty logicProperty = new LogicProperty();
+    public static Boolean open = false;
 
     /**
      * 目标文档对应的逻辑删除字段

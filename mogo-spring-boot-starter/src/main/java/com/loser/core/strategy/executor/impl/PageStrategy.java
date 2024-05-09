@@ -14,7 +14,7 @@ public class PageStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.page((LambdaQueryWrapper) args[0], (Integer) args[1], (Integer) args[2], clazz));
+        replace(args, interceptor.page((LambdaQueryWrapper<?>) args[0], (Integer) args[1], (Integer) args[2], clazz));
     }
 
 }

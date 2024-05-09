@@ -8,7 +8,6 @@ import com.loser.core.replacer.Replacer;
 import com.loser.core.wrapper.LambdaQueryWrapper;
 import com.loser.core.wrapper.Wrappers;
 import com.loser.utils.BoolFunction;
-import com.loser.utils.ClassUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,8 +28,8 @@ public class LogicRemoveByIdReplacer implements Replacer {
         if (Objects.isNull(result)) {
             return method.invoke(target, args);
         }
-        Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), LambdaQueryWrapper.class);
-        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq("_id", ClassUtil.getId(args[0])).eq(result.getColumn(), result.getLogicNotDeleteValue());
+        Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
+        LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq("_id", args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
         Object entity = clazz.newInstance();
         Field field = entity.getClass().getDeclaredField(result.getColumn());
         field.setAccessible(true);

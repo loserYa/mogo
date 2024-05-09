@@ -14,7 +14,7 @@ public class RemoveStrategy implements MethodExecutorStrategy {
 
     @Override
     public void invoke(Class<?> clazz, Interceptor interceptor, Object[] args) {
-        replace(args, interceptor.remove((LambdaQueryWrapper) args[0], clazz));
+        replace(args, interceptor.remove((LambdaQueryWrapper<?>) args[0], clazz));
     }
 
 }

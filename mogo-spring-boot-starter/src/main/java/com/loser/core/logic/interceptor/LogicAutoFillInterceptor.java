@@ -30,14 +30,14 @@ public class LogicAutoFillInterceptor implements Interceptor {
             field.setAccessible(true);
             field.set(entity, result.getLogicNotDeleteValue());
         } catch (Exception e) {
-            ExceptionUtils.mpe(e);
+            throw ExceptionUtils.mpe(e);
         }
         return build(entity);
 
     }
 
     @Override
-    public Object[] saveBatch(Collection entityList, Class<?> clazz) {
+    public Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
 
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
@@ -52,7 +52,7 @@ public class LogicAutoFillInterceptor implements Interceptor {
                 }
                 field.set(entity, result.getLogicNotDeleteValue());
             } catch (Exception e) {
-                ExceptionUtils.mpe(e);
+                throw ExceptionUtils.mpe(e);
             }
         }
         return build(entityList);

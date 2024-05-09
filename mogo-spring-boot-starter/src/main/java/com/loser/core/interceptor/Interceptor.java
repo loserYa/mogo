@@ -16,7 +16,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构造器
      * @return 查询到的集合数据
      */
-    default Object[] getOne(LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] getOne(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
     }
 
@@ -36,7 +36,7 @@ public interface Interceptor {
      * @param entityList 需要保存的数据列表
      * @return 是否保存成功
      */
-    default Object[] saveBatch(Collection entityList, Class<?> clazz) {
+    default Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
         return build(entityList);
     }
 
@@ -56,7 +56,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构建器
      * @return 是否删除成功
      */
-    default Object[] remove(LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] remove(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
     }
 
@@ -77,7 +77,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构建起
      * @return 是否更新成功
      */
-    default Object[] update(Object entity, LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(entity);
     }
 
@@ -97,7 +97,7 @@ public interface Interceptor {
      * @param idList 数据ID集合
      * @return 查询到的数据集合
      */
-    default Object[] listByIds(Collection idList, Class<?> clazz) {
+    default Object[] listByIds(Collection<?> idList, Class<?> clazz) {
         return build(idList);
     }
 
@@ -107,7 +107,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构建起
      * @return 数据两
      */
-    default Object[] count(LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] count(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
     }
 
@@ -117,7 +117,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构建器
      * @return 数据集合
      */
-    default Object[] list(LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] list(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
     }
 
@@ -129,7 +129,7 @@ public interface Interceptor {
      * @param pageSize     页面大小
      * @return 分页对象
      */
-    default Object[] page(LambdaQueryWrapper queryWrapper, int pageNo, int pageSize, Class<?> clazz) {
+    default Object[] page(LambdaQueryWrapper<?> queryWrapper, int pageNo, int pageSize, Class<?> clazz) {
         return build(queryWrapper, pageNo, pageSize);
     }
 
@@ -139,7 +139,7 @@ public interface Interceptor {
      * @param queryWrapper 条件构建器
      * @return 是否存在数据
      */
-    default Object[] exist(LambdaQueryWrapper queryWrapper, Class<?> clazz) {
+    default Object[] exist(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
     }
 

@@ -26,7 +26,7 @@ public interface MethodExecutorStrategy {
     default void replace(Object[] oldArgs, Object[] newArgs) {
 
         if (oldArgs.length != newArgs.length) {
-            ExceptionUtils.mpe("args length not match");
+            throw ExceptionUtils.mpe("args length not match");
         }
         System.arraycopy(newArgs, 0, oldArgs, 0, oldArgs.length);
 

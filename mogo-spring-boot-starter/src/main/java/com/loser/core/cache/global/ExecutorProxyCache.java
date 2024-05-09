@@ -10,6 +10,7 @@ import com.loser.core.strategy.executor.impl.GetOneStrategy;
 import com.loser.core.strategy.executor.impl.ListByIdsStrategy;
 import com.loser.core.strategy.executor.impl.ListStrategy;
 import com.loser.core.strategy.executor.impl.PageStrategy;
+import com.loser.core.strategy.executor.impl.RemoveByIdStrategy;
 import com.loser.core.strategy.executor.impl.RemoveStrategy;
 import com.loser.core.strategy.executor.impl.SaveBatchStrategy;
 import com.loser.core.strategy.executor.impl.SaveStrategy;
@@ -33,7 +34,7 @@ public class ExecutorProxyCache {
         EXECUTOR_MAP.put(ExecuteMethodEnum.GET_ONE.getMethod(), new GetOneStrategy());
         EXECUTOR_MAP.put(ExecuteMethodEnum.SAVE.getMethod(), new SaveStrategy());
         EXECUTOR_MAP.put(ExecuteMethodEnum.SAVE_BATCH.getMethod(), new SaveBatchStrategy());
-        EXECUTOR_MAP.put(ExecuteMethodEnum.REMOVE_BY_ID.getMethod(), new RemoveStrategy());
+        EXECUTOR_MAP.put(ExecuteMethodEnum.REMOVE_BY_ID.getMethod(), new RemoveByIdStrategy());
         EXECUTOR_MAP.put(ExecuteMethodEnum.REMOVE.getMethod(), new RemoveStrategy());
         EXECUTOR_MAP.put(ExecuteMethodEnum.UPDATE_BY_ID.getMethod(), new UpdateByIdStrategy());
         EXECUTOR_MAP.put(ExecuteMethodEnum.UPDATE.getMethod(), new UpdateStrategy());
