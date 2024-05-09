@@ -1,4 +1,4 @@
-package com.loser.core.anno;
+package com.loser.core.ds;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -1,6 +1,5 @@
-package com.loser.core.proxy;
+package com.loser.core.ds;
 
-import com.loser.core.anno.MongoDs;
 import com.loser.core.cache.global.MongoTemplateCache;
 import com.loser.core.sdk.MogoService;
 

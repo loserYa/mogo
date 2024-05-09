@@ -1,6 +1,6 @@
 package com.loser.module.user.service.impl;
 
-import com.loser.core.anno.MongoDs;
+import com.loser.core.ds.MongoDs;
 import com.loser.core.impl.MogoServiceImpl;
 import com.loser.module.user.entity.User;
 import com.loser.module.user.service.UserService;

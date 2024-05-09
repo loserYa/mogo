@@ -1,9 +1,9 @@
 package com.loser.core.proxy.factory;
 
-import com.loser.core.anno.CollectionLogic;
 import com.loser.core.cache.global.CollectionLogicDeleteCache;
 import com.loser.core.config.MogoConfiguration;
 import com.loser.core.logic.AnnotationHandler;
+import com.loser.core.logic.CollectionLogic;
 import com.loser.core.logic.entity.ClassAnnotationFiled;
 import com.loser.core.logic.entity.LogicDeleteResult;
 import com.loser.core.logic.entity.LogicProperty;

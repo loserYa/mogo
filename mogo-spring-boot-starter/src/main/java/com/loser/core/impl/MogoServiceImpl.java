@@ -1,9 +1,9 @@
 package com.loser.core.impl;
 
-import com.loser.core.anno.MongoDs;
 import com.loser.core.cache.BaseContext;
+import com.loser.core.ds.MongoDs;
+import com.loser.core.ds.ServiceDataSourceProxy;
 import com.loser.core.entity.Page;
-import com.loser.core.proxy.ServiceDataSourceProxy;
 import com.loser.core.sdk.MogoService;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
