@@ -1,6 +1,6 @@
 package com.loser.module.room.service.impl;
 
-import com.loser.core.impl.MogoServiceImpl;
+import com.loser.core.sdk.impl.MogoServiceImpl;
 import com.loser.module.room.entity.Room;
 import com.loser.module.room.service.RoomService;
 import org.springframework.stereotype.Service;

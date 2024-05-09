@@ -1,7 +1,7 @@
 package com.loser;
 
-import com.loser.core.config.MogoConfiguration;
-import com.loser.core.logic.entity.LogicProperty;
+import com.loser.config.MogoConfiguration;
+import com.loser.module.logic.entity.LogicProperty;
 import com.loser.module.room.service.RoomService;
 import com.loser.module.user.entity.User;
 import com.loser.module.user.service.UserService;

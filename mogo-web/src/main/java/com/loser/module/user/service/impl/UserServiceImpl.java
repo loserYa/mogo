@@ -1,7 +1,7 @@
 package com.loser.module.user.service.impl;
 
-import com.loser.core.ds.MongoDs;
-import com.loser.core.impl.MogoServiceImpl;
+import com.loser.core.sdk.impl.MogoServiceImpl;
+import com.loser.module.datasource.MongoDs;
 import com.loser.module.user.entity.User;
 import com.loser.module.user.service.UserService;
 import org.springframework.stereotype.Service;

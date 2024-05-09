@@ -1,6 +1,6 @@
 package com.loser.module.loser;
 
-import com.loser.core.logic.CollectionLogic;
+import com.loser.module.logic.CollectionLogic;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
