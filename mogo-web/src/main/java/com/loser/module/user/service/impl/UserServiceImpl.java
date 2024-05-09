@@ -1,5 +1,6 @@
 package com.loser.module.user.service.impl;
 
+import com.loser.core.anno.MongoDs;
 import com.loser.core.impl.MogoServiceImpl;
 import com.loser.module.user.entity.User;
 import com.loser.module.user.service.UserService;
@@ -12,6 +13,12 @@ import org.springframework.stereotype.Service;
  * @date 2023-02-05  13:58
  */
 @Service
+@MongoDs("loser")
 public class UserServiceImpl extends MogoServiceImpl<Long, User> implements UserService {
+
+    @Override
+    public User getById(Long id) {
+        return super.getById(id);
+    }
 
 }

@@ -11,7 +11,6 @@ import com.loser.core.proxy.MapperProxy;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.sdk.mapper.DefaultBaseMapper;
 import com.loser.utils.StringUtils;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -27,9 +26,9 @@ import java.util.Objects;
 public class MapperFactory {
 
     @SuppressWarnings("all")
-    public static BaseMapper getMapper(MongoTemplate template, Class<?> clazz) {
+    public static BaseMapper getMapper(Class<?> clazz) {
 
-        BaseMapper mapper = new DefaultBaseMapper<>(template, clazz);
+        BaseMapper mapper = new DefaultBaseMapper<>(clazz);
         Class<? extends BaseMapper> mapperClass = mapper.getClass();
         mapper(clazz);
         return (BaseMapper) Proxy.newProxyInstance(mapperClass.getClassLoader(), mapperClass.getInterfaces(), new MapperProxy(mapper));

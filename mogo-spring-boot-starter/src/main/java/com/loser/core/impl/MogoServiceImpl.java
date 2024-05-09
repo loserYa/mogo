@@ -1,16 +1,20 @@
 package com.loser.core.impl;
 
+import com.loser.core.anno.MongoDs;
 import com.loser.core.cache.BaseContext;
 import com.loser.core.entity.Page;
+import com.loser.core.proxy.ServiceDataSourceProxy;
 import com.loser.core.sdk.MogoService;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
+import com.loser.utils.AnnotationUtil;
 import com.loser.utils.ClassUtil;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.Serializable;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,21 +25,18 @@ import java.util.List;
  * @date 2023-02-04  18:53
  */
 @SuppressWarnings("all")
-public class MogoServiceImpl<I extends Serializable, T> implements MogoService<I, T> {
+public abstract class MogoServiceImpl<I extends Serializable, T> implements MogoService<I, T>, FactoryBean {
 
     /**
      * 服务类对应的mongo实体类
      */
     private final Class<T> targetClass = (Class<T>) ClassUtil.getTClass(this);
 
-    @Resource
-    protected MongoTemplate mongoTemplate;
-
     protected BaseMapper<I, T> baseMapper;
 
     @PostConstruct
     public void init() {
-        this.baseMapper = BaseContext.getMapper(targetClass, mongoTemplate);
+        this.baseMapper = BaseContext.getMapper(targetClass);
     }
 
     @Override
@@ -111,6 +112,22 @@ public class MogoServiceImpl<I extends Serializable, T> implements MogoService<I
     @Override
     public boolean exist(LambdaQueryWrapper<T> queryWrapper) {
         return baseMapper.exist(queryWrapper);
+    }
+
+    @Override
+    public Object getObject() {
+        Class<? extends MogoServiceImpl> aClass = this.getClass();
+        boolean exist = AnnotationUtil.isExistMethodAndFunction(aClass, MongoDs.class);
+        if (exist) {
+            return Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), new ServiceDataSourceProxy(this));
+        }
+        return this;
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        Class<? extends MogoServiceImpl> aClass = this.getClass();
+        return aClass;
     }
 
 }

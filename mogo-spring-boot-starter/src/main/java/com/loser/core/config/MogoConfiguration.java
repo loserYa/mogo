@@ -2,6 +2,7 @@ package com.loser.core.config;
 
 import com.loser.core.cache.global.CollectionLogicDeleteCache;
 import com.loser.core.cache.global.InterceptorCache;
+import com.loser.core.cache.global.MongoTemplateCache;
 import com.loser.core.cache.global.ReplacerCache;
 import com.loser.core.interceptor.Interceptor;
 import com.loser.core.logic.entity.LogicProperty;
@@ -17,6 +18,7 @@ import com.loser.utils.ExceptionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +30,6 @@ import java.util.Objects;
  * @author loser
  * @date 2024/5/9
  */
-
 public class MogoConfiguration implements ApplicationContextAware {
 
     private static final MogoConfiguration configuration = new MogoConfiguration();
@@ -74,6 +75,11 @@ public class MogoConfiguration implements ApplicationContextAware {
             interceptor(interceptors);
         }
 
+    }
+
+    public MogoConfiguration template(String name, MongoTemplate mongoTemplate) {
+        MongoTemplateCache.CACHE.put(name, mongoTemplate);
+        return this;
     }
 
     /**

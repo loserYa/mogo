@@ -1,5 +1,6 @@
 package com.loser.core.sdk.mapper;
 
+import com.loser.core.cache.global.MongoTemplateCache;
 import com.loser.core.constant.MogoConstant;
 import com.loser.core.entity.Page;
 import com.loser.core.wrapper.LambdaQueryWrapper;
@@ -20,12 +21,9 @@ import java.util.Objects;
 
 public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<I, T> {
 
-    private final MongoTemplate mongoTemplate;
-
     private final Class<T> targetClass;
 
-    public DefaultBaseMapper(MongoTemplate mongoTemplate, Class<T> targetClass) {
-        this.mongoTemplate = mongoTemplate;
+    public DefaultBaseMapper(Class<T> targetClass) {
         this.targetClass = targetClass;
     }
 
@@ -33,20 +31,20 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     public T getOne(LambdaQueryWrapper<T> queryWrapper) {
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
-        return mongoTemplate.findOne(query, targetClass);
+        return getTemplate().findOne(query, targetClass);
 
     }
 
     @Override
     public boolean save(T entity) {
-        mongoTemplate.save(entity);
+        getTemplate().save(entity);
         return true;
     }
 
     @Override
     public boolean saveBatch(Collection<T> entityList) {
 
-        entityList.forEach(mongoTemplate::save);
+        entityList.forEach(getTemplate()::save);
         return true;
 
     }
@@ -56,7 +54,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
         Query query = new Query(criteria);
-        DeleteResult deleteResult = mongoTemplate.remove(query, targetClass);
+        DeleteResult deleteResult = getTemplate().remove(query, targetClass);
         return deleteResult.getDeletedCount() > 0;
 
     }
@@ -65,7 +63,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     public boolean remove(LambdaQueryWrapper<T> queryWrapper) {
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
-        DeleteResult remove = mongoTemplate.remove(query, targetClass);
+        DeleteResult remove = getTemplate().remove(query, targetClass);
         return remove.getDeletedCount() > 0;
 
     }
@@ -76,7 +74,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         Criteria criteria = Criteria.where(MogoConstant.ID).is(ClassUtil.getId(entity));
         Query query = new Query(criteria);
         Update update = getUpdate(entity);
-        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, targetClass);
+        UpdateResult updateResult = getTemplate().updateFirst(query, update, targetClass);
         return updateResult.getModifiedCount() > 0;
 
     }
@@ -106,7 +104,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
         Update update = getUpdate(entity);
-        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, targetClass);
+        UpdateResult updateResult = getTemplate().updateFirst(query, update, targetClass);
         return updateResult.getModifiedCount() > 0;
 
     }
@@ -116,7 +114,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
         Query query = new Query(criteria);
-        return mongoTemplate.findOne(query, targetClass);
+        return getTemplate().findOne(query, targetClass);
 
     }
 
@@ -125,7 +123,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Criteria criteria = Criteria.where(MogoConstant.ID).in(idList);
         Query query = new Query(criteria);
-        return mongoTemplate.find(query, targetClass);
+        return getTemplate().find(query, targetClass);
 
     }
 
@@ -133,7 +131,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     public long count(LambdaQueryWrapper<T> queryWrapper) {
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
-        return mongoTemplate.count(query, targetClass);
+        return getTemplate().count(query, targetClass);
 
     }
 
@@ -141,7 +139,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     public List<T> list(LambdaQueryWrapper<T> queryWrapper) {
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
-        return mongoTemplate.find(query, targetClass);
+        return getTemplate().find(query, targetClass);
 
     }
 
@@ -152,13 +150,13 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         Page<T> page = new Page<>();
         page.setPageSize(pageSize);
         page.setPageNum(pageNo);
-        long total = mongoTemplate.count(query, targetClass);
+        long total = getTemplate().count(query, targetClass);
         page.setTotal(total);
         if (total <= 0) {
             return page;
         }
         query.skip((long) (pageNo - 1) * pageSize).limit(pageSize);
-        List<T> list = mongoTemplate.find(query, targetClass);
+        List<T> list = getTemplate().find(query, targetClass);
         page.setRecords(list);
         return page;
 
@@ -167,12 +165,12 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public boolean exist(LambdaQueryWrapper<T> queryWrapper) {
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
-        return mongoTemplate.exists(query, targetClass);
+        return getTemplate().exists(query, targetClass);
     }
 
     @Override
     public MongoTemplate getTemplate() {
-        return mongoTemplate;
+        return MongoTemplateCache.CACHE.get(MongoTemplateCache.getDataSource());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.loser.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,23 @@ public class AnnotationUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * 查找类或者公共方法上是否存在改注解
+     */
+    public static boolean isExistMethodAndFunction(Class<?> aClass, Class<? extends Annotation> anno) {
+
+        if (aClass.isAnnotationPresent(anno)) {
+            return true;
+        }
+        for (Method method : aClass.getMethods()) {
+            if (method.isAnnotationPresent(anno)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
 }
