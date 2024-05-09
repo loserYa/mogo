@@ -73,6 +73,7 @@ public class MogoApplication {
         User byId = userService.getById(1715249422667L);
         byId = userService.getById(1715249422667L);
         RoomService roomService = context.getBean(RoomService.class);
+        MongoTemplate template = roomService.getTemplate();
         roomService.getById("111");
         System.out.println(byId);
     }
