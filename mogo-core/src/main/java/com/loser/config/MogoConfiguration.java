@@ -4,8 +4,10 @@ import com.loser.function.interceptor.Interceptor;
 import com.loser.function.replacer.Replacer;
 import com.loser.global.cache.CollectionLogicDeleteCache;
 import com.loser.global.cache.InterceptorCache;
+import com.loser.global.cache.MogoCache;
 import com.loser.global.cache.MongoTemplateCache;
 import com.loser.global.cache.ReplacerCache;
+import com.loser.hardcode.constant.MogoConstant;
 import com.loser.module.logic.entity.LogicProperty;
 import com.loser.module.logic.interceptor.CollectionLogiceInterceptor;
 import com.loser.module.logic.interceptor.LogicAutoFillInterceptor;
@@ -15,6 +17,8 @@ import com.loser.module.logic.replacer.LogicRemoveByIdReplacer;
 import com.loser.module.logic.replacer.LogicRemoveReplacer;
 import com.loser.module.logic.replacer.LogicUpdateByIdReplacer;
 import com.loser.utils.ExceptionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -23,6 +27,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 全局配置,单例
@@ -31,6 +36,9 @@ import java.util.Objects;
  * @date 2024/5/9
  */
 public class MogoConfiguration implements ApplicationContextAware {
+
+
+    private static final Log LOGGER = LogFactory.getLog(MogoConfiguration.class);
 
     private static final MogoConfiguration configuration = new MogoConfiguration();
 
@@ -46,6 +54,9 @@ public class MogoConfiguration implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
+        if (!MogoCache.open) {
+            return;
+        }
         // 01 加载容器类的拦截器
         loadIocInterceptors(applicationContext);
         // 02 加载容器内的替换器
@@ -61,6 +72,7 @@ public class MogoConfiguration implements ApplicationContextAware {
         Replacer[] replacers = applicationContext.getBeansOfType(Replacer.class).values().toArray(new Replacer[0]);
         if (replacers.length > 0) {
             replacer(replacers);
+            LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo loadIocReplacers finish %s", Arrays.stream(replacers).map(i -> i.getClass().getName()).collect(Collectors.toList())));
         }
 
     }
@@ -73,12 +85,24 @@ public class MogoConfiguration implements ApplicationContextAware {
         Interceptor[] interceptors = applicationContext.getBeansOfType(Interceptor.class).values().toArray(new Interceptor[0]);
         if (interceptors.length > 0) {
             interceptor(interceptors);
+            LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo loadIocInterceptors finish %s", Arrays.stream(interceptors).map(i -> i.getClass().getName()).collect(Collectors.toList())));
         }
 
     }
 
     public MogoConfiguration template(String name, MongoTemplate mongoTemplate) {
         MongoTemplateCache.CACHE.put(name, mongoTemplate);
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo init MongoTemplate finish { %s : %s }", name, mongoTemplate));
+        return this;
+    }
+
+    /**
+     * 开启全部 mogo 功能
+     *
+     * @return 全部配置对象
+     */
+    public MogoConfiguration enableMogo() {
+        MogoCache.open = true;
         return this;
     }
 
@@ -90,6 +114,7 @@ public class MogoConfiguration implements ApplicationContextAware {
      */
     public MogoConfiguration logic(LogicProperty logicProperty) {
 
+        checkEnable();
         if (Objects.nonNull(this.logicProperty)) {
             throw ExceptionUtils.mpe("logicProperty is config");
         }
@@ -97,9 +122,6 @@ public class MogoConfiguration implements ApplicationContextAware {
         CollectionLogicDeleteCache.open = logicProperty.getOpen();
         if (logicProperty.getOpen()) {
             this.interceptor(CollectionLogiceInterceptor.class);
-            if (logicProperty.getAutoFill()) {
-                this.interceptor(LogicAutoFillInterceptor.class);
-            }
             this.replacer(
                     LogicGetByIdReplacer.class,
                     LogicListByIdsReplacer.class,
@@ -107,9 +129,20 @@ public class MogoConfiguration implements ApplicationContextAware {
                     LogicRemoveReplacer.class,
                     LogicUpdateByIdReplacer.class
             );
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo logicDel is enable");
+            if (logicProperty.getAutoFill()) {
+                this.interceptor(LogicAutoFillInterceptor.class);
+                LOGGER.info(MogoConstant.LOG_PRE + "mogo logicDel autoFill is enable");
+            }
         }
         return this;
 
+    }
+
+    private static void checkEnable() {
+        if (!MogoCache.open) {
+            throw ExceptionUtils.mpe("mogo switch is unEnable");
+        }
     }
 
     /**
@@ -117,6 +150,7 @@ public class MogoConfiguration implements ApplicationContextAware {
      */
     public final MogoConfiguration replacer(Replacer... replacers) {
 
+        checkEnable();
         List<Replacer> replacersCache = ReplacerCache.replacers;
         replacersCache.addAll(Arrays.asList(replacers));
         ReplacerCache.sorted();
@@ -146,6 +180,7 @@ public class MogoConfiguration implements ApplicationContextAware {
      */
     public final MogoConfiguration interceptor(Interceptor... interceptors) {
 
+        checkEnable();
         List<Interceptor> interceptorsCache = InterceptorCache.interceptors;
         interceptorsCache.addAll(Arrays.asList(interceptors));
         InterceptorCache.sorted();
@@ -171,6 +206,7 @@ public class MogoConfiguration implements ApplicationContextAware {
     }
 
     public LogicProperty getLogicProperty() {
+        checkEnable();
         return logicProperty;
     }
 

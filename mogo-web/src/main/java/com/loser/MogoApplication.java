@@ -1,5 +1,6 @@
 package com.loser;
 
+import com.loser.core.anno.EnableMogo;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.global.cache.MongoTemplateCache;
 import com.loser.module.user.entity.User;
@@ -14,8 +15,8 @@ import java.util.Map;
 
 @SpringBootConfiguration
 @SpringBootApplication
+@EnableMogo
 public class MogoApplication {
-
 
     public static void main(String[] args) {
 

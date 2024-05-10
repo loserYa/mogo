@@ -6,4 +6,6 @@ public interface MogoConstant {
 
     String MASTER_DS = "master";
 
+    String LOG_PRE = "====== MOGO ======> ";
+
 }

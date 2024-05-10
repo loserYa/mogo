@@ -1,6 +1,5 @@
 package com.loser.config;
 
-import com.loser.hardcode.constant.MogoConstant;
 import com.loser.properties.MogoDataSourceProperties;
 import com.loser.properties.MogoLogicProperties;
 import com.loser.utils.ExceptionUtils;
@@ -14,9 +13,6 @@ import org.springframework.boot.autoconfigure.mongo.MongoClientFactory;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoPropertiesClientSettingsBuilderCustomizer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -24,40 +20,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
 public class MogoAutoConfiguration {
 
     private final MogoDataSourceProperties mogoDataSourceProperties;
     private final MogoLogicProperties mogoLogicProperties;
-    private final MongoTemplate mongoTemplate;
     private final Environment environment;
 
     public MogoAutoConfiguration(
             Environment environment,
-            MongoTemplate mongoTemplate,
             MogoLogicProperties mogoLogicProperties,
             MogoDataSourceProperties mogoDataSourceProperties
     ) {
         this.mogoDataSourceProperties = mogoDataSourceProperties;
         this.mogoLogicProperties = mogoLogicProperties;
-        this.mongoTemplate = mongoTemplate;
         this.environment = environment;
+        initLogic();
+        initDynamicDatasource();
     }
 
-    @Bean
-    @Order(Integer.MIN_VALUE)
-    public MogoConfiguration mogoConfiguration() {
-
-        MogoConfiguration.instance().logic(mogoLogicProperties);
-        MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
+    private void initDynamicDatasource() {
 
         for (Map.Entry<String, MongoProperties> entry : mogoDataSourceProperties.getDatasource().entrySet()) {
             MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue());
             MogoConfiguration.instance().template(entry.getKey(), template);
         }
 
-        return MogoConfiguration.instance();
+    }
 
+    private void initLogic() {
+        MogoConfiguration.instance().logic(mogoLogicProperties);
     }
 
     private MongoTemplate buildTemplate(String ds, MongoProperties properties) {
