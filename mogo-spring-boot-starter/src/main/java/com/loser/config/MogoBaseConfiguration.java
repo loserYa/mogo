@@ -61,7 +61,7 @@ public class MogoBaseConfiguration {
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
         System.out.println(":: Mogo starIng ::            v1.0.0");
-        System.out.println(":: gitee        ::            https://gitee.com/lyilan8080/mogo-parent");
+        System.out.println(":: gitee        ::            https://gitee.com/lyilan8080/mogo");
         System.out.println();
         if (MogoCache.open) {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo global switch is enable");
