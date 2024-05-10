@@ -6,12 +6,20 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 注解工具
+ *
+ * @author loser
+ * @date 2024/5/10
+ */
 public class AnnotationUtil {
+
+    private AnnotationUtil() {
+    }
 
     public static <T extends Annotation> T findFirstAnnotation(Class<T> annotationClazz, Field field) {
         return getAnnotation(annotationClazz, new HashSet<>(), field.getDeclaredAnnotations());
     }
-
 
     @SuppressWarnings("unchecked")
     private static <T extends Annotation> T getAnnotation(Class<T> annotationClazz, Set<Class<? extends Annotation>> annotationSet, Annotation... annotations) {

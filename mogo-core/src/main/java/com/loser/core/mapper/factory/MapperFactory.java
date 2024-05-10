@@ -6,12 +6,15 @@ import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.sdk.mapper.DefaultBaseMapper;
 import com.loser.global.cache.CollectionLogicDeleteCache;
 import com.loser.global.cache.MogoCache;
+import com.loser.hardcode.constant.MogoConstant;
 import com.loser.module.logic.AnnotationHandler;
 import com.loser.module.logic.CollectionLogic;
 import com.loser.module.logic.entity.ClassAnnotationFiled;
 import com.loser.module.logic.entity.LogicDeleteResult;
 import com.loser.module.logic.entity.LogicProperty;
 import com.loser.utils.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -26,6 +29,8 @@ import java.util.Objects;
  */
 public class MapperFactory {
 
+    private static final Log LOGGER = LogFactory.getLog(MapperFactory.class);
+
     @SuppressWarnings("all")
     public static BaseMapper getMapper(Class<?> clazz) {
 
@@ -35,10 +40,15 @@ public class MapperFactory {
         }
         Class<? extends BaseMapper> mapperClass = mapper.getClass();
         mapper(clazz);
-        return (BaseMapper) Proxy.newProxyInstance(mapperClass.getClassLoader(), mapperClass.getInterfaces(), new MapperProxy(mapper));
+        Object o = Proxy.newProxyInstance(mapperClass.getClassLoader(), mapperClass.getInterfaces(), new MapperProxy(mapper));
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("init mogo Mapper proxy finish %s %s", clazz.getName(), o));
+        return (BaseMapper) o;
 
     }
 
+    /**
+     * 映射实体与逻辑删除字段的关系
+     */
     private static void mapper(Class<?> clazz) {
 
         if (!CollectionLogicDeleteCache.open) {

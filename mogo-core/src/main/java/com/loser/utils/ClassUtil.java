@@ -5,10 +5,14 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 字节码工具
@@ -95,6 +99,22 @@ public class ClassUtil {
         CACHE.put(clazz, result);
         return result;
 
+    }
+
+    private static final Set<String> OBJ_METHOD;
+
+    static {
+        OBJ_METHOD = Arrays.stream(Object.class.getMethods()).map(Method::getName).collect(Collectors.toSet());
+    }
+
+    /**
+     * 判断指定的方法是否属于Object类的方法。
+     *
+     * @param method 要检查的方法实例
+     * @return 如果该方法是Object类的方法，则返回true；否则返回false。
+     */
+    public static boolean isObjectMethod(Method method) {
+        return OBJ_METHOD.contains(method.getName());
     }
 
 }

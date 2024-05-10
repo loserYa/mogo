@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
  */
 public class QueryBuildUtils {
 
+    private QueryBuildUtils() {
+    }
+
     private static final Map<ECompare, Function<Condition, Criteria>> HANDLERS = new ConcurrentHashMap<>();
 
     static {

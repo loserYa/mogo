@@ -6,6 +6,7 @@ import com.loser.function.replacer.Replacer;
 import com.loser.global.cache.ExecutorProxyCache;
 import com.loser.global.cache.InterceptorCache;
 import com.loser.global.cache.ReplacerCache;
+import com.loser.utils.ClassUtil;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,7 +18,7 @@ import java.util.Objects;
  * @author loser
  * @date 2024/5/8
  */
-@SuppressWarnings("")
+@SuppressWarnings("all")
 public class MapperProxy implements InvocationHandler {
 
     private final BaseMapper target;
@@ -38,9 +39,11 @@ public class MapperProxy implements InvocationHandler {
         }
 
         // 方法替换执行器 执行首个命中执行器
-        for (Replacer replacer : ReplacerCache.replacers) {
-            if (replacer.supplier().get(proxy, target, method, args)) {
-                return replacer.invoke(target.getTragetClass(), proxy, target, method, args);
+        if (!ClassUtil.isObjectMethod(method)) {
+            for (Replacer replacer : ReplacerCache.replacers) {
+                if (replacer.supplier().get(proxy, target, method, args)) {
+                    return replacer.invoke(target.getTragetClass(), proxy, target, method, args);
+                }
             }
         }
 

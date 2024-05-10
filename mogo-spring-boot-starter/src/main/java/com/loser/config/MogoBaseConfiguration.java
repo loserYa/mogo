@@ -26,8 +26,7 @@ import java.util.Map;
 @EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
 public class MogoBaseConfiguration {
 
-
-    private static final Log LOGGER = LogFactory.getLog(MogoConfiguration.class);
+    private static final Log LOGGER = LogFactory.getLog(MogoBaseConfiguration.class);
     private final MongoTemplate mongoTemplate;
 
     public MogoBaseConfiguration(
@@ -60,8 +59,8 @@ public class MogoBaseConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starIng ::            v1.0.0");
-        System.out.println(":: gitee        ::            https://gitee.com/lyilan8080/mogo");
+        System.out.println(":: Mogo starting ::           v1.0.0");
+        System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println();
         if (MogoCache.open) {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo global switch is enable");

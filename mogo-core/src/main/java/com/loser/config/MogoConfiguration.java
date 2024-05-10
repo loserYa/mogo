@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
  */
 public class MogoConfiguration implements ApplicationContextAware {
 
-
     private static final Log LOGGER = LogFactory.getLog(MogoConfiguration.class);
 
     private static final MogoConfiguration configuration = new MogoConfiguration();
