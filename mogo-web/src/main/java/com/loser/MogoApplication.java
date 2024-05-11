@@ -15,7 +15,7 @@ import java.util.Map;
 
 @SpringBootConfiguration
 @SpringBootApplication
-@EnableMogo
+@EnableMogo(base = true, logic = true, autoFill = true, dynamicDs = true)
 public class MogoApplication {
 
     public static void main(String[] args) {

@@ -5,7 +5,7 @@ import com.loser.core.mapper.MapperProxy;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.sdk.mapper.DefaultBaseMapper;
 import com.loser.global.cache.CollectionLogicDeleteCache;
-import com.loser.global.cache.MogoCache;
+import com.loser.global.cache.MogoEnableCache;
 import com.loser.hardcode.constant.MogoConstant;
 import com.loser.module.logic.AnnotationHandler;
 import com.loser.module.logic.CollectionLogic;
@@ -35,7 +35,7 @@ public class MapperFactory {
     public static BaseMapper getMapper(Class<?> clazz) {
 
         BaseMapper mapper = new DefaultBaseMapper<>(clazz);
-        if (!MogoCache.open) {
+        if (!MogoEnableCache.base) {
             return mapper;
         }
         Class<? extends BaseMapper> mapperClass = mapper.getClass();

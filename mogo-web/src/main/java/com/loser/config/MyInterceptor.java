@@ -1,9 +1,8 @@
 package com.loser.config;
 
 import com.loser.function.interceptor.Interceptor;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MyInterceptor implements Interceptor {
 
     @Override

@@ -6,7 +6,7 @@ import com.loser.core.sdk.MogoService;
 import com.loser.core.sdk.mapper.BaseMapper;
 import com.loser.core.wrapper.LambdaQueryWrapper;
 import com.loser.global.BaseMapperContext;
-import com.loser.global.cache.MogoCache;
+import com.loser.global.cache.MogoEnableCache;
 import com.loser.module.datasource.MongoDs;
 import com.loser.module.datasource.ServiceDataSourceProxy;
 import com.loser.utils.AnnotationUtil;
@@ -128,7 +128,7 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     @Override
     public Object getObject() {
 
-        if (!MogoCache.open) {
+        if (!MogoEnableCache.base) {
             return this;
         }
         Class<?> aClass = getObjectType();

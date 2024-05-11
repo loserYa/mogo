@@ -18,4 +18,24 @@ import java.lang.annotation.Target;
 @Documented
 public @interface EnableMogo {
 
+    /**
+     * 是否开启基础功能
+     */
+    boolean base() default false;
+
+    /**
+     * 是否开启逻辑删除功能
+     */
+    boolean logic() default false;
+
+    /**
+     * 是否开启逻辑字段自动填充功能
+     */
+    boolean autoFill() default false;
+
+    /**
+     * 是否开启多数据源
+     */
+    boolean dynamicDs() default false;
+
 }

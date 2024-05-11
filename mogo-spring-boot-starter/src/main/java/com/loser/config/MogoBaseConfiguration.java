@@ -1,10 +1,11 @@
 package com.loser.config;
 
 import com.loser.core.anno.EnableMogo;
-import com.loser.global.cache.MogoCache;
+import com.loser.global.cache.MogoEnableCache;
 import com.loser.hardcode.constant.MogoConstant;
 import com.loser.properties.MogoDataSourceProperties;
 import com.loser.properties.MogoLogicProperties;
+import com.loser.utils.AnnotationUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,7 +16,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 基础必要配置
@@ -36,18 +39,32 @@ public class MogoBaseConfiguration {
             MogoDataSourceProperties mogoDataSourceProperties,
             MogoLogicProperties mogoLogicProperties
     ) {
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(EnableMogo.class);
-        if (!CollectionUtils.isEmpty(beans)) {
-            MogoConfiguration.instance().enableMogo();
-        }
+        enableFun(applicationContext);
         logBaseInfo();
-
         this.mongoTemplate = mongoTemplate;
-        if (MogoCache.open) {
+        if (MogoEnableCache.dynamicDs) {
             new MogoAutoConfiguration(environment, mogoLogicProperties, mogoDataSourceProperties);
         }
 
     }
+
+    private static void enableFun(ApplicationContext applicationContext) {
+
+        List<Object> beans = new ArrayList<>(applicationContext.getBeansWithAnnotation(EnableMogo.class).values());
+        if (CollectionUtils.isEmpty(beans)) {
+            return;
+        }
+        Object o = beans.get(0);
+        EnableMogo enableMogo = AnnotationUtil.getAnnotation(o.getClass(), EnableMogo.class);
+        if (Objects.nonNull(enableMogo)) {
+            MogoEnableCache.base = enableMogo.base();
+            MogoEnableCache.logic = enableMogo.logic();
+            MogoEnableCache.autoFill = enableMogo.autoFill();
+            MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
+        }
+
+    }
+
 
     private void logBaseInfo() {
 
@@ -62,10 +79,25 @@ public class MogoBaseConfiguration {
         System.out.println(":: Mogo starting ::           v1.0.0");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println();
-        if (MogoCache.open) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo global switch is enable");
+        if (MogoEnableCache.base) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is enable");
         } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo global switch is unEnable");
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is unEnable");
+        }
+        if (MogoEnableCache.logic) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is unEnable");
+        }
+        if (MogoEnableCache.autoFill) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [autoFill] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [autoFill] switch is unEnable");
+        }
+        if (MogoEnableCache.dynamicDs) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is unEnable");
         }
 
     }
