@@ -7,7 +7,7 @@ import java.util.Collection;
 public interface Interceptor {
 
     default int order() {
-        return Integer.MAX_VALUE;
+        return 1;
     }
 
     /**

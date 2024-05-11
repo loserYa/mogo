@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 public interface Replacer {
 
     default int order() {
-        return Integer.MIN_VALUE;
+        return 1;
     }
 
     Object invoke(Class<?> clazz, Object proxy, Object target, Method method, Object[] args) throws Throwable;
