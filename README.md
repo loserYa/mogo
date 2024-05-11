@@ -7,9 +7,9 @@ article: false
 
 [mogo](https://gitee.com/lyilan8080/mogo)是一个 [MongoDB]() 的操作工具，是增强 MongoTemplate 而生，为简化开发、提高效率而生。
 
-::: tip 愿景
+
 我们的愿景是成为 MongoTemplate 最好的搭档，就像 [魂斗罗](/img/contra.jpg) 中的 1P、2P，基友搭配，效率翻倍。
-:::
+
 
 ## 特性
 
