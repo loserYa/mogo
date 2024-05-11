@@ -1,10 +1,3 @@
----
-title: 📚 简介
-date: 2023-7-17 17:17:01
-permalink: /pages/24112f/
-article: false
----
-
 [mogo](https://gitee.com/lyilan8080/mogo)是一个 [MongoDB]() 的操作工具，是增强 MongoTemplate 而生，为简化开发、提高效率而生。
 
 
