@@ -35,6 +35,19 @@ public class ClassUtil {
      */
     private static final Map<Class<?>, Field> FIELD_CACHE = new ConcurrentHashMap<>(64);
 
+    public static Field getField(Class<?> clazz, String name) {
+
+        if (clazz.equals(Object.class)) {
+            throw ExceptionUtils.mpe(String.format("NoSuchFieldException %s", name));
+        }
+        try {
+            return clazz.getDeclaredField(name);
+        } catch (Exception ignore) {
+            return getField(clazz.getSuperclass(), name);
+        }
+
+    }
+
     /**
      * 获取mongo集合实体的主键值
      *

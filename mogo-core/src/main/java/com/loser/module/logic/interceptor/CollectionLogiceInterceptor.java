@@ -49,11 +49,11 @@ public class CollectionLogiceInterceptor implements Interceptor {
 
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
-            return build(args);
+            return args;
         }
         LambdaQueryWrapper<?> queryWrapper = (LambdaQueryWrapper<?>) args[index];
         queryWrapper.eq(result.getColumn(), result.getLogicNotDeleteValue());
-        return build(args);
+        return args;
 
     }
 

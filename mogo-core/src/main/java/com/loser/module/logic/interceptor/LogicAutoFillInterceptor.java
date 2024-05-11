@@ -4,6 +4,7 @@ package com.loser.module.logic.interceptor;
 import com.loser.function.interceptor.Interceptor;
 import com.loser.global.cache.CollectionLogicDeleteCache;
 import com.loser.module.logic.entity.LogicDeleteResult;
+import com.loser.utils.ClassUtil;
 import com.loser.utils.ExceptionUtils;
 
 import java.lang.reflect.Field;
@@ -26,12 +27,7 @@ public class LogicAutoFillInterceptor implements Interceptor {
             return build(entity);
         }
         try {
-            Field field;
-            try {
-                field = entity.getClass().getDeclaredField(result.getFiled());
-            } catch (Exception ignore) {
-                field = entity.getClass().getSuperclass().getDeclaredField(result.getFiled());
-            }
+            Field field = ClassUtil.getField(entity.getClass(), result.getFiled());
             field.setAccessible(true);
             field.set(entity, result.getLogicNotDeleteValue());
         } catch (Exception e) {
@@ -52,11 +48,7 @@ public class LogicAutoFillInterceptor implements Interceptor {
         for (Object entity : entityList) {
             try {
                 if (Objects.isNull(field)) {
-                    try {
-                        field = entity.getClass().getDeclaredField(result.getFiled());
-                    } catch (Exception ignore) {
-                        field = entity.getClass().getSuperclass().getDeclaredField(result.getFiled());
-                    }
+                    field = ClassUtil.getField(entity.getClass(), result.getFiled());
                     field.setAccessible(true);
                 }
                 field.set(entity, result.getLogicNotDeleteValue());

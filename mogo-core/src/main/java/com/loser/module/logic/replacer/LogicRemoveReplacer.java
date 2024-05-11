@@ -7,6 +7,7 @@ import com.loser.global.cache.CollectionLogicDeleteCache;
 import com.loser.global.cache.MogoEnableCache;
 import com.loser.hardcode.constant.ExecuteMethodEnum;
 import com.loser.module.logic.entity.LogicDeleteResult;
+import com.loser.utils.ClassUtil;
 import com.loser.utils.func.BoolFunction;
 
 import java.lang.reflect.Field;
@@ -30,7 +31,7 @@ public class LogicRemoveReplacer implements Replacer {
         }
         Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
         Object entity = clazz.newInstance();
-        Field field = entity.getClass().getDeclaredField(result.getFiled());
+        Field field = ClassUtil.getField(entity.getClass(), result.getFiled());
         field.setAccessible(true);
         field.set(entity, result.getLogicDeleteValue());
         return newMethod.invoke(target, build(entity, args[0]));

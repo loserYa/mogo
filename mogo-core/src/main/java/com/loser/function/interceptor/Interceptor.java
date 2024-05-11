@@ -78,7 +78,7 @@ public interface Interceptor {
      * @return 是否更新成功
      */
     default Object[] update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
-        return build(entity);
+        return build(entity, queryWrapper);
     }
 
     /**
