@@ -51,7 +51,7 @@ public class MapperFactory {
      */
     private static void mapper(Class<?> clazz) {
 
-        if (!CollectionLogicDeleteCache.open) {
+        if (!MogoEnableCache.logic) {
             return;
         }
         Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = CollectionLogicDeleteCache.logicDeleteResultHashMap;

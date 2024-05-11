@@ -15,11 +15,6 @@ import java.util.Map;
 public class CollectionLogicDeleteCache {
 
     /**
-     * 是否开启逻辑删除功能
-     */
-    public static Boolean open = false;
-
-    /**
      * 目标文档对应的逻辑删除字段
      */
     public static final Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = new HashMap<>();

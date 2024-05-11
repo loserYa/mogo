@@ -2,7 +2,6 @@ package com.loser.config;
 
 import com.loser.function.interceptor.Interceptor;
 import com.loser.function.replacer.Replacer;
-import com.loser.global.cache.CollectionLogicDeleteCache;
 import com.loser.global.cache.InterceptorCache;
 import com.loser.global.cache.MogoEnableCache;
 import com.loser.global.cache.MongoTemplateCache;
@@ -103,7 +102,6 @@ public class MogoConfiguration implements ApplicationContextAware {
      */
     public MogoConfiguration logic(LogicProperty logicProperty) {
 
-        CollectionLogicDeleteCache.open = MogoEnableCache.logic;
         if (!MogoEnableCache.logic) {
             throw ExceptionUtils.mpe("mogo logic is unEnable");
         }

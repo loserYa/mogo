@@ -5,6 +5,7 @@ import com.loser.core.wrapper.LambdaQueryWrapper;
 import com.loser.core.wrapper.Wrappers;
 import com.loser.function.replacer.Replacer;
 import com.loser.global.cache.CollectionLogicDeleteCache;
+import com.loser.global.cache.MogoEnableCache;
 import com.loser.hardcode.constant.ExecuteMethodEnum;
 import com.loser.hardcode.constant.MogoConstant;
 import com.loser.module.logic.entity.LogicDeleteResult;
@@ -41,7 +42,7 @@ public class LogicRemoveByIdReplacer implements Replacer {
 
     @Override
     public BoolFunction supplier() {
-        return (proxy, target, method, args) -> CollectionLogicDeleteCache.open && method.getName().equals(ExecuteMethodEnum.REMOVE_BY_ID.getMethod());
+        return (proxy, target, method, args) -> MogoEnableCache.logic && method.getName().equals(ExecuteMethodEnum.REMOVE_BY_ID.getMethod());
     }
 
 }
