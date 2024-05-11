@@ -9,7 +9,7 @@ import io.github.loserya.utils.ExceptionUtils;
  * 方法执行策略(解耦逻辑)
  *
  * @author loser
- * @date 2024/4/28
+ * @since 1.0.0
  */
 public interface MethodExecutorStrategy {
 

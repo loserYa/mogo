@@ -25,7 +25,7 @@ import java.util.Objects;
  * 基础必要配置
  *
  * @author loser
- * @date 2024/5/10
+ * @since 1.0.0
  */
 @EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
 public class MogoBaseConfiguration {

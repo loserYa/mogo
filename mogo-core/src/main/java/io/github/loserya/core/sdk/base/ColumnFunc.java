@@ -6,7 +6,7 @@ import java.io.Serializable;
  * 功能接口
  *
  * @author loser
- * @date 2023/2/4 21:09
+ * @since 1.0.0
  */
 public interface ColumnFunc<T, LambdaQueryWrapper> extends Serializable {
 

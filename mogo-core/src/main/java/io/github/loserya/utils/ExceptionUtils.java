@@ -22,7 +22,7 @@ import io.github.loserya.hardcode.exception.MogoException;
  * 异常工具
  *
  * @author loser
- * @date 2023/2/5 17:33
+ * @since 1.0.0
  */
 public final class ExceptionUtils {
 

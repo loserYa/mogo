@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
  * 目标类首个指定注解结果包裹对象
  *
  * @author loser
- * @date 2024/4/28
+ * @since 1.0.0
  */
 public class ClassAnnotationFiled<T extends Annotation> {
 

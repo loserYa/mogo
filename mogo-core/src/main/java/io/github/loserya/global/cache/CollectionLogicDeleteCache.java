@@ -10,7 +10,7 @@ import java.util.Map;
  * 全局逻辑删除基础信息缓存
  *
  * @author loser
- * @date 2024/4/29
+ * @since 1.0.0
  */
 public class CollectionLogicDeleteCache {
 

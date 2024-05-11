@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * 拦截器缓存
  *
  * @author loser
- * @date 2024/5/9
+ * @since 1.0.0
  */
 public class InterceptorCache {
 

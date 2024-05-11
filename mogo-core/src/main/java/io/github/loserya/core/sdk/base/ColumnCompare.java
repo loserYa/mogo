@@ -7,7 +7,7 @@ import java.util.Collection;
  * 查询条件封装
  *
  * @author loser
- * @date 2023/2/4 21:09
+ * @since 1.0.0
  */
 public interface ColumnCompare<LambdaQueryWrapper> extends Serializable {
 

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * mongo 多数据源
  *
  * @author loser
- * @date 2024/5/9
+ * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

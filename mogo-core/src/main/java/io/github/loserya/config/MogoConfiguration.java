@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * 全局配置,单例
  *
  * @author loser
- * @date 2024/5/9
+ * @since 1.0.0
  */
 public class MogoConfiguration implements ApplicationContextAware {
 

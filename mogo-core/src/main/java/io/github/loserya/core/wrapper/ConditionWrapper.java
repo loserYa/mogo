@@ -11,7 +11,7 @@ import java.util.List;
  * 条件包装类
  *
  * @author loser
- * @date 2023-02-04  17:07
+ * @since 1.0.0
  */
 public class ConditionWrapper {
 

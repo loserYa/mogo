@@ -13,7 +13,7 @@ import java.util.Objects;
  * 服务类数据源切换代理类
  *
  * @author loser
- * @date 2024/5/9
+ * @since 1.0.0
  */
 @SuppressWarnings("all")
 public class ServiceDataSourceProxy implements InvocationHandler {

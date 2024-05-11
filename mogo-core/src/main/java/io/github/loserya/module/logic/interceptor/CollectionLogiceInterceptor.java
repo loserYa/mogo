@@ -11,7 +11,7 @@ import java.util.Objects;
  * 逻辑删除拦截器
  *
  * @author loser
- * @date 2024/4/30
+ * @since 1.0.0
  */
 public class CollectionLogiceInterceptor implements Interceptor {
 

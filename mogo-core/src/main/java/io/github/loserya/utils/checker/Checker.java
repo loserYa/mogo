@@ -14,7 +14,7 @@ import java.util.Objects;
  * 参数校验工具
  *
  * @author loser
- * @date 2022/7/4 15:05
+ * @since 1.0.0
  */
 public class Checker<T> {
 

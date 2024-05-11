@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * 表字段逻辑处理注解（逻辑删除）
  *
  * @author loser
- * @date 2024/4/28
+ * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

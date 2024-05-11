@@ -20,7 +20,7 @@ package io.github.loserya.hardcode.exception;
  * mogo 异常类
  *
  * @author loser
- * @date 2023/2/5 17:29
+ * @since 1.0.0
  */
 public class MogoException extends RuntimeException {
 

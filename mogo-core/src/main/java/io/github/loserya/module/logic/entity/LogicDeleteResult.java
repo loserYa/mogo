@@ -4,7 +4,7 @@ package io.github.loserya.module.logic.entity;
  * 逻辑删除信息
  *
  * @author loser
- * @date 2024/4/29
+ * @since 1.0.0
  */
 public class LogicDeleteResult {
 

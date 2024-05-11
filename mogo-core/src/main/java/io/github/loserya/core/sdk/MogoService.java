@@ -14,7 +14,7 @@ import java.util.List;
  * mongo 基础方法接口
  *
  * @author loser
- * @date 2023-02-04  18:52
+ * @since 1.0.0
  */
 public interface MogoService<I extends Serializable, T> {
 

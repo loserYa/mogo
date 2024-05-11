@@ -4,7 +4,7 @@ package io.github.loserya.global.cache;
  * mogo 功能统一开关
  *
  * @author loser
- * @date 2024/5/12
+ * @since 1.0.0
  */
 public class MogoEnableCache {
 

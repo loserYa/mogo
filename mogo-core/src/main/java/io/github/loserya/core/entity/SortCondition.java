@@ -6,7 +6,7 @@ import io.github.loserya.hardcode.constant.ESortType;
  * 排序字段
  *
  * @author loser
- * @date 2023-02-04  17:07
+ * @since 1.0.0
  */
 public class SortCondition {
 

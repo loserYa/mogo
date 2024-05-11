@@ -4,7 +4,7 @@ package io.github.loserya.utils.checker;
  * 比较类型
  *
  * @author loser
- * @date 2023/2/4 17:12
+ * @since 1.0.0
  */
 public enum ECheckType {
 

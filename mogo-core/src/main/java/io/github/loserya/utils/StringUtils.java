@@ -5,7 +5,7 @@ package io.github.loserya.utils;
  * 字符串工具类
  *
  * @author loser
- * @date 2023/2/5 17:37
+ * @since 1.0.0
  */
 public class StringUtils {
 

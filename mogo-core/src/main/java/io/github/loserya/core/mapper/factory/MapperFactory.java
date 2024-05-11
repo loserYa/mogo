@@ -25,7 +25,7 @@ import java.util.Objects;
  * BaseMapper 工厂
  *
  * @author loser
- * @date 2024/5/9
+ * @since 1.0.0
  */
 public class MapperFactory {
 

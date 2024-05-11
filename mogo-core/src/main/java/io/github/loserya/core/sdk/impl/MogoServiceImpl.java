@@ -25,7 +25,7 @@ import java.util.List;
  * 默认的服务实现类
  *
  * @author loser
- * @date 2023-02-04  18:53
+ * @since 1.0.0
  */
 @SuppressWarnings("all")
 public abstract class MogoServiceImpl<I extends Serializable, T> implements MogoService<I, T>, FactoryBean {

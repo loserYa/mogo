@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * 不是使用则默认只存在 lambda 简化 CRUD 功能
  *
  * @author loser
- * @date 2024/5/10
+ * @since 1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

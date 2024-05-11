@@ -5,7 +5,7 @@ package io.github.loserya.core.entity;
  * 查询的列
  *
  * @author loser
- * @date 2023-02-04  17:07
+ * @since 1.0.0
  */
 public class SelectField {
 

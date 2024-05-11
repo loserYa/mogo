@@ -12,7 +12,7 @@ import java.util.Objects;
  * 注解处理类
  *
  * @author loser
- * @date 2024/4/29
+ * @since 1.0.0
  */
 public interface AnnotationHandler {
 

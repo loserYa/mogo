@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * 查询工具构建工具
  *
  * @author loser
- * @date 2023/6/13
+ * @since 1.0.0
  */
 public class QueryBuildUtils {
 

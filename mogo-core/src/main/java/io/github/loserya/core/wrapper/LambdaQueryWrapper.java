@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * 条件构建器
  *
  * @author loser
- * @date 2023/2/5 17:29
+ * @since 1.0.0
  */
 public class LambdaQueryWrapper<T>
         implements

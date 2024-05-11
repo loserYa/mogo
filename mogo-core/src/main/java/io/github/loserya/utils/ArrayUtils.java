@@ -4,7 +4,7 @@ package io.github.loserya.utils;
  * ArrayUtils工具类
  *
  * @author loser
- * @date 2023/2/5 17:30
+ * @since 1.0.0
  */
 public final class ArrayUtils {
 

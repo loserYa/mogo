@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 为了获取字段名字
  *
  * @author lsoer
- * @since 2018-05-12
+ * @since 1.0.0
  */
 @FunctionalInterface
 public interface SFunction<T, R> extends Serializable {

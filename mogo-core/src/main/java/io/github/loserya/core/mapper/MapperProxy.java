@@ -16,7 +16,7 @@ import java.util.Objects;
  * mapper 代理类
  *
  * @author loser
- * @date 2024/5/8
+ * @since 1.0.0 2024/5/8
  */
 @SuppressWarnings("all")
 public class MapperProxy implements InvocationHandler {
