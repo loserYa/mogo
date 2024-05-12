@@ -75,4 +75,25 @@ public class StringUtils {
         }
         return true;
     }
+
+    public static boolean checkValNull(Object object) {
+        return !checkValNotNull(object);
+    }
+
+    public static boolean checkValNotNull(Object object) {
+        if (object instanceof CharSequence) {
+            return isNotEmpty((CharSequence) object);
+        }
+        return object != null;
+    }
+
+    public static boolean isNotEmpty(CharSequence cs) {
+        return !isEmpty(cs);
+    }
+
+    public static boolean isEmpty(CharSequence cs) {
+        return cs == null || cs.length() == 0;
+    }
+
+
 }

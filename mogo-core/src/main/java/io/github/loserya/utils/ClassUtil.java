@@ -98,6 +98,7 @@ public class ClassUtil {
         for (Field field : clazz.getDeclaredFields()) {
             Id annotation = field.getAnnotation(Id.class);
             if (Objects.nonNull(annotation)) {
+                field.setAccessible(true);
                 FIELD_CACHE.put(clazz, field);
                 return field;
             }

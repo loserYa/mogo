@@ -8,6 +8,10 @@ import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.module.fill.MetaObjectInterceptor;
+import io.github.loserya.module.idgen.strategy.impl.AutoStrategy;
+import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
+import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
+import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import org.bson.Document;
@@ -36,9 +40,25 @@ public class MogoAutoConfiguration {
         this.mogoDataSourceProperties = mogoDataSourceProperties;
         this.mogoLogicProperties = mogoLogicProperties;
         this.environment = environment;
+        // 初始化逻辑删除
         initLogic();
+        // 初始化动态数据源
         initDynamicDatasource();
+        // 初始化自定填充
         initMetaFill();
+        // 初始化ID生成
+        initIdGenStrategy();
+    }
+
+    private void initIdGenStrategy() {
+
+        MogoConfiguration.instance().idGenStrategy(
+                AutoStrategy.class,
+                SnowStrategy.class,
+                ULIDStrategy.class,
+                UUIDStrategy.class
+        );
+
     }
 
     private void initMetaFill() {

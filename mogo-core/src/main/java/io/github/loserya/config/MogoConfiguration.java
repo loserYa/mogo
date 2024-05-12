@@ -2,6 +2,7 @@ package io.github.loserya.config;
 
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.function.replacer.Replacer;
+import io.github.loserya.global.cache.IdGenStrategyCache;
 import io.github.loserya.global.cache.InterceptorCache;
 import io.github.loserya.global.cache.MeatObjectCache;
 import io.github.loserya.global.cache.MogoEnableCache;
@@ -10,6 +11,7 @@ import io.github.loserya.global.cache.ReplacerCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.fill.FieldFillHandler;
 import io.github.loserya.module.fill.MetaObjectHandler;
+import io.github.loserya.module.idgen.strategy.IdGenStrategy;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
@@ -63,14 +65,31 @@ public class MogoConfiguration implements ApplicationContextAware {
         // 02 加载容器内的替换器
         loadIocReplacers(applicationContext);
         // 03 加载对象字段填充处理器
-        loadIdsMeatFilHandlers(applicationContext);
+        loadIocMeatFilHandlers(applicationContext);
+        // 04 加载ID生成策略处理器
+        loadIocIdGenStrategy(applicationContext);
+
+    }
+
+    /**
+     * 加载ID生成策略处理器 可覆盖系统内置 id 生成器 建议只重写 CUSTOM
+     */
+    private void loadIocIdGenStrategy(ApplicationContext applicationContext) {
+
+        // 添加全局
+        IdGenStrategy[] strategies = applicationContext.getBeansOfType(IdGenStrategy.class).values().toArray(new IdGenStrategy[0]);
+        if (strategies.length > 0) {
+            idGenStrategy(strategies);
+        }
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo idStrategies finish %s", Arrays.stream(strategies).map(i -> i.getClass().getName()).collect(Collectors.toList())));
+
 
     }
 
     /**
      * 加载对象字段填充处理器
      */
-    private void loadIdsMeatFilHandlers(ApplicationContext applicationContext) {
+    private void loadIocMeatFilHandlers(ApplicationContext applicationContext) {
 
         // 添加全局
         MetaObjectHandler[] metaObjectHandlers = applicationContext.getBeansOfType(MetaObjectHandler.class).values().toArray(new MetaObjectHandler[0]);
@@ -182,6 +201,37 @@ public class MogoConfiguration implements ApplicationContextAware {
 
     }
 
+    /**
+     * 添加 id 生成器
+     */
+    public final MogoConfiguration idGenStrategy(IdGenStrategy... handlers) {
+
+        if (!MogoEnableCache.base) {
+            throw ExceptionUtils.mpe("mogo base is unEnable");
+        }
+        for (IdGenStrategy handler : handlers) {
+            IdGenStrategyCache.MAP.put(handler.getType(), handler);
+        }
+        return this;
+
+    }
+
+    /**
+     * 添加 id 生成器
+     */
+    @SafeVarargs
+    public final MogoConfiguration idGenStrategy(Class<? extends IdGenStrategy>... handlers) {
+
+        IdGenStrategy[] strategies = Arrays.stream(handlers).map(item -> {
+            try {
+                return item.newInstance();
+            } catch (Exception e) {
+                throw ExceptionUtils.mpe(e);
+            }
+        }).toArray(IdGenStrategy[]::new);
+        return idGenStrategy(strategies);
+
+    }
 
     /**
      * 添加全局填充器

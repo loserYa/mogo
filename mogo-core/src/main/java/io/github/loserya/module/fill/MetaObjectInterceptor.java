@@ -7,6 +7,7 @@ import io.github.loserya.module.fill.anno.FieldAutoFill;
 import io.github.loserya.module.fill.entity.FiledFillResult;
 import io.github.loserya.module.fill.entity.FiledMeta;
 import io.github.loserya.module.fill.hardcode.FieldFill;
+import io.github.loserya.module.idgen.IdGenHandler;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.ExceptionUtils;
 import org.springframework.util.CollectionUtils;
@@ -28,6 +29,7 @@ public class MetaObjectInterceptor implements Interceptor {
     @Override
     public Object[] save(Object entity, Class<?> clazz) {
 
+        handleIdGen(entity);
         handleFileByAnno(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
         handlerMetaObject(true, entity, clazz);
         return Interceptor.super.save(entity, clazz);
@@ -38,6 +40,7 @@ public class MetaObjectInterceptor implements Interceptor {
     public Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
 
         entityList.forEach(entity -> {
+            handleIdGen(entity);
             handleFileByAnno(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
             handlerMetaObject(true, entity, clazz);
         });
@@ -151,6 +154,10 @@ public class MetaObjectInterceptor implements Interceptor {
         }
         return listFiledFill(fields, clazz.getSuperclass());
 
+    }
+
+    private void handleIdGen(Object entity) {
+        IdGenHandler.setId(entity);
     }
 
 }
