@@ -91,9 +91,9 @@ public class MogoBaseConfiguration {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is unEnable");
         }
         if (MogoEnableCache.autoFill) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [autoFill] switch is enable");
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is enable");
         } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [autoFill] switch is unEnable");
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is unEnable");
         }
         if (MogoEnableCache.dynamicDs) {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is enable");

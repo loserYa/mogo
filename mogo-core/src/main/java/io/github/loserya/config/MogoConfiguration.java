@@ -3,10 +3,13 @@ package io.github.loserya.config;
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.function.replacer.Replacer;
 import io.github.loserya.global.cache.InterceptorCache;
+import io.github.loserya.global.cache.MeatObjectCache;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.global.cache.ReplacerCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
+import io.github.loserya.module.fill.FieldFillHandler;
+import io.github.loserya.module.fill.MetaObjectHandler;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
@@ -59,6 +62,29 @@ public class MogoConfiguration implements ApplicationContextAware {
         loadIocInterceptors(applicationContext);
         // 02 加载容器内的替换器
         loadIocReplacers(applicationContext);
+        // 03 加载对象字段填充处理器
+        loadIdsMeatFilHandlers(applicationContext);
+
+    }
+
+    /**
+     * 加载对象字段填充处理器
+     */
+    private void loadIdsMeatFilHandlers(ApplicationContext applicationContext) {
+
+        // 添加全局
+        MetaObjectHandler[] metaObjectHandlers = applicationContext.getBeansOfType(MetaObjectHandler.class).values().toArray(new MetaObjectHandler[0]);
+        if (metaObjectHandlers.length > 0) {
+            metaObjHandler(metaObjectHandlers);
+        }
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo metaObjectHandlers finish %s", Arrays.stream(metaObjectHandlers).map(i -> i.getClass().getName()).collect(Collectors.toList())));
+
+        // 添加单个字段
+        FieldFillHandler<?>[] fillHandlers = applicationContext.getBeansOfType(FieldFillHandler.class).values().toArray(new FieldFillHandler[0]);
+        if (fillHandlers.length > 0) {
+            filedFill(fillHandlers);
+        }
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo fillHandlers finish %s", Arrays.stream(metaObjectHandlers).map(i -> i.getClass().getName()).collect(Collectors.toList())));
 
     }
 
@@ -121,6 +147,70 @@ public class MogoConfiguration implements ApplicationContextAware {
             this.interceptor(LogicAutoFillInterceptor.class);
         }
         return this;
+
+    }
+
+    /**
+     * 添加全局填充器
+     */
+    public final MogoConfiguration filedFill(FieldFillHandler<?>... handlers) {
+
+        if (!MogoEnableCache.base) {
+            throw ExceptionUtils.mpe("mogo base is unEnable");
+        }
+        for (FieldFillHandler<?> handler : handlers) {
+            MeatObjectCache.HANDLER_MAP.put(handler.getClass(), handler);
+        }
+        return this;
+
+    }
+
+    /**
+     * 添加替换器
+     */
+    @SafeVarargs
+    public final MogoConfiguration filedFill(Class<? extends FieldFillHandler<?>>... handlers) {
+
+        FieldFillHandler<?>[] metaObjectHandlers = Arrays.stream(handlers).map(item -> {
+            try {
+                return item.newInstance();
+            } catch (Exception e) {
+                throw ExceptionUtils.mpe(e);
+            }
+        }).toArray(FieldFillHandler[]::new);
+        return filedFill(metaObjectHandlers);
+
+    }
+
+
+    /**
+     * 添加全局填充器
+     */
+    public final MogoConfiguration metaObjHandler(MetaObjectHandler... handlers) {
+
+        if (!MogoEnableCache.base) {
+            throw ExceptionUtils.mpe("mogo base is unEnable");
+        }
+        MeatObjectCache.handlers.addAll(Arrays.asList(handlers));
+        MeatObjectCache.sorted();
+        return this;
+
+    }
+
+    /**
+     * 添加替换器
+     */
+    @SafeVarargs
+    public final MogoConfiguration metaObjHandler(Class<? extends MetaObjectHandler>... handlers) {
+
+        MetaObjectHandler[] metaObjectHandlers = Arrays.stream(handlers).map(item -> {
+            try {
+                return item.newInstance();
+            } catch (Exception e) {
+                throw ExceptionUtils.mpe(e);
+            }
+        }).toArray(MetaObjectHandler[]::new);
+        return metaObjHandler(metaObjectHandlers);
 
     }
 

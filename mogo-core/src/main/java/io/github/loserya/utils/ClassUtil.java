@@ -8,10 +8,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -28,12 +28,14 @@ public class ClassUtil {
     /**
      * 缓存目标类上的泛型值
      */
-    private static final Map<Class<?>, Class<?>> CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<?>, Class<?>> CACHE = new HashMap<>(64);
 
     /**
      * 缓存mongo实体的主键字段
      */
-    private static final Map<Class<?>, Field> FIELD_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<?>, Field> FIELD_CACHE = new HashMap<>(64);
+
+    private static final Map<String, Field> FIELD_MAP = new HashMap<>();
 
     public static Field getField(Class<?> clazz, String name) {
 
@@ -43,8 +45,22 @@ public class ClassUtil {
         try {
             return clazz.getDeclaredField(name);
         } catch (Exception ignore) {
-            return getField(clazz.getSuperclass(), name);
+            return getFieldWitchCache(clazz.getSuperclass(), name);
         }
+
+    }
+
+    public static Field getFieldWitchCache(Class<?> clazz, String name) {
+
+        String key = String.format("%s.%s", clazz.getName(), name);
+        Field field = FIELD_MAP.get(key);
+        if (Objects.nonNull(field)) {
+            return field;
+        }
+        field = getField(clazz, name);
+        field.setAccessible(true);
+        FIELD_MAP.put(key, field);
+        return field;
 
     }
 

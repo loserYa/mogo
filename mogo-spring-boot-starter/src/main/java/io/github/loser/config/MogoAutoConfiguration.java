@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCursor;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
+import io.github.loserya.module.fill.MetaObjectInterceptor;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import org.bson.Document;
@@ -37,6 +38,11 @@ public class MogoAutoConfiguration {
         this.environment = environment;
         initLogic();
         initDynamicDatasource();
+        initMetaFill();
+    }
+
+    private void initMetaFill() {
+        MogoConfiguration.instance().interceptor(MetaObjectInterceptor.class);
     }
 
     private void initDynamicDatasource() {

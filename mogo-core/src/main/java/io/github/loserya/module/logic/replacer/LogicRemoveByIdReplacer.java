@@ -34,8 +34,7 @@ public class LogicRemoveByIdReplacer implements Replacer {
         Method newMethod = target.getClass().getDeclaredMethod(ExecuteMethodEnum.UPDATE.getMethod(), Object.class, LambdaQueryWrapper.class);
         LambdaQueryWrapper<Object> query = Wrappers.lambdaQuery().eq(MogoConstant.ID, args[0]).eq(result.getColumn(), result.getLogicNotDeleteValue());
         Object entity = clazz.newInstance();
-        Field field = ClassUtil.getField(entity.getClass(), result.getFiled());
-        field.setAccessible(true);
+        Field field = ClassUtil.getFieldWitchCache(entity.getClass(), result.getFiled());
         field.set(entity, result.getLogicDeleteValue());
         return newMethod.invoke(target, build(entity, query));
 
