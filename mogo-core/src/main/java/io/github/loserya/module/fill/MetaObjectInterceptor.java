@@ -28,7 +28,7 @@ public class MetaObjectInterceptor implements Interceptor {
     @Override
     public Object[] save(Object entity, Class<?> clazz) {
 
-        setSaveValue(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
+        handleFileByAnno(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
         handlerMetaObject(true, entity, clazz);
         return Interceptor.super.save(entity, clazz);
 
@@ -38,7 +38,7 @@ public class MetaObjectInterceptor implements Interceptor {
     public Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
 
         entityList.forEach(entity -> {
-            setSaveValue(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
+            handleFileByAnno(entity, clazz, FieldFill.INSERT, FieldFill.INSERT_UPDATE);
             handlerMetaObject(true, entity, clazz);
         });
         return Interceptor.super.saveBatch(entityList, clazz);
@@ -48,7 +48,7 @@ public class MetaObjectInterceptor implements Interceptor {
     @Override
     public Object[] updateById(Object entity, Class<?> clazz) {
 
-        setSaveValue(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
+        handleFileByAnno(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
         handlerMetaObject(false, entity, clazz);
         return Interceptor.super.updateById(entity, clazz);
 
@@ -57,7 +57,7 @@ public class MetaObjectInterceptor implements Interceptor {
     @Override
     public Object[] update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
 
-        setSaveValue(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
+        handleFileByAnno(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
         handlerMetaObject(false, entity, clazz);
         return Interceptor.super.update(entity, queryWrapper, clazz);
 
@@ -90,7 +90,7 @@ public class MetaObjectInterceptor implements Interceptor {
     /**
      * 处理单个注解标志的字段填充
      */
-    private static void setSaveValue(Object entity, Class<?> clazz, FieldFill... types) {
+    private static void handleFileByAnno(Object entity, Class<?> clazz, FieldFill... types) {
 
         List<FiledFillResult> fillResults = listFiledFill(clazz);
         fillResults.stream().filter(item -> {
