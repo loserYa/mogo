@@ -96,7 +96,7 @@ public interface Compare<LambdaQueryWrapper, R> extends Serializable {
      * @param val    比较值
      * @return 当前条件构建器
      */
-    default LambdaQueryWrapper in(R column, Collection<Object> val) {
+    default LambdaQueryWrapper in(R column, Collection val) {
         return in(true, column, val);
     }
 
@@ -107,7 +107,7 @@ public interface Compare<LambdaQueryWrapper, R> extends Serializable {
      * @param val    比较值
      * @return 当前条件构建器
      */
-    default LambdaQueryWrapper notIn(R column, Collection<Object> val) {
+    default LambdaQueryWrapper notIn(R column, Collection val) {
         return notIn(true, column, val);
     }
 
@@ -190,7 +190,7 @@ public interface Compare<LambdaQueryWrapper, R> extends Serializable {
      * @param val       比较值
      * @return 当前条件构建器
      */
-    LambdaQueryWrapper in(boolean condition, R column, Collection<Object> val);
+    LambdaQueryWrapper in(boolean condition, R column, Collection val);
 
     /**
      * notIn 条件构建
@@ -200,6 +200,6 @@ public interface Compare<LambdaQueryWrapper, R> extends Serializable {
      * @param val       比较值
      * @return 当前条件构建器
      */
-    LambdaQueryWrapper notIn(boolean condition, R column, Collection<Object> val);
+    LambdaQueryWrapper notIn(boolean condition, R column, Collection val);
 
 }

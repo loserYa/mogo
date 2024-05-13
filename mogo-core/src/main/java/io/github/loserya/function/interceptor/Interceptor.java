@@ -41,16 +41,6 @@ public interface Interceptor {
     }
 
     /**
-     * 通过ID删除数据
-     *
-     * @param id 数据ID
-     * @return 是否删除成功
-     */
-    default Object[] removeById(Object id, Class<?> clazz) {
-        return build(id);
-    }
-
-    /**
      * 通过条件构建器删除数据
      *
      * @param queryWrapper 条件构建器
@@ -58,16 +48,6 @@ public interface Interceptor {
      */
     default Object[] remove(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(queryWrapper);
-    }
-
-    /**
-     * 通过ID更新数据 只有存在数据的字段才会更新
-     *
-     * @param entity 需要更新的数据
-     * @return 是否更新成功
-     */
-    default Object[] updateById(Object entity, Class<?> clazz) {
-        return build(entity);
     }
 
     /**
@@ -81,25 +61,6 @@ public interface Interceptor {
         return build(entity, queryWrapper);
     }
 
-    /**
-     * 通过ID获取数据
-     *
-     * @param id 数据ID
-     * @return 集合中的数据
-     */
-    default Object[] getById(Object id, Class<?> clazz) {
-        return build(id);
-    }
-
-    /**
-     * 通过数据ID集合获取数据集合
-     *
-     * @param idList 数据ID集合
-     * @return 查询到的数据集合
-     */
-    default Object[] listByIds(Collection<?> idList, Class<?> clazz) {
-        return build(idList);
-    }
 
     /**
      * 通过条件构建起统计数据量

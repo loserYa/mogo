@@ -5,11 +5,8 @@ import com.mongodb.client.result.UpdateResult;
 import io.github.loserya.core.entity.Page;
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
 import io.github.loserya.global.cache.MongoTemplateCache;
-import io.github.loserya.hardcode.constant.MogoConstant;
-import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.QueryBuildUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
@@ -50,32 +47,11 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     }
 
     @Override
-    public boolean removeById(I id) {
-
-        Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
-        Query query = new Query(criteria);
-        DeleteResult deleteResult = getTemplate().remove(query, targetClass);
-        return deleteResult.getDeletedCount() > 0;
-
-    }
-
-    @Override
     public boolean remove(LambdaQueryWrapper<T> queryWrapper) {
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
         DeleteResult remove = getTemplate().remove(query, targetClass);
         return remove.getDeletedCount() > 0;
-
-    }
-
-    @Override
-    public boolean updateById(T entity) {
-
-        Criteria criteria = Criteria.where(MogoConstant.ID).is(ClassUtil.getId(entity));
-        Query query = new Query(criteria);
-        Update update = getUpdate(entity);
-        UpdateResult updateResult = getTemplate().updateFirst(query, update, targetClass);
-        return updateResult.getModifiedCount() > 0;
 
     }
 
@@ -106,24 +82,6 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         Update update = getUpdate(entity);
         UpdateResult updateResult = getTemplate().updateFirst(query, update, targetClass);
         return updateResult.getModifiedCount() > 0;
-
-    }
-
-    @Override
-    public T getById(I id) {
-
-        Criteria criteria = Criteria.where(MogoConstant.ID).is(id);
-        Query query = new Query(criteria);
-        return getTemplate().findOne(query, targetClass);
-
-    }
-
-    @Override
-    public Collection<T> listByIds(Collection<I> idList) {
-
-        Criteria criteria = Criteria.where(MogoConstant.ID).in(idList);
-        Query query = new Query(criteria);
-        return getTemplate().find(query, targetClass);
 
     }
 

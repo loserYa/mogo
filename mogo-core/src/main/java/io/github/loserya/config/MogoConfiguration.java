@@ -15,11 +15,7 @@ import io.github.loserya.module.idgen.strategy.IdGenStrategy;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
-import io.github.loserya.module.logic.replacer.LogicGetByIdReplacer;
-import io.github.loserya.module.logic.replacer.LogicListByIdsReplacer;
-import io.github.loserya.module.logic.replacer.LogicRemoveByIdReplacer;
 import io.github.loserya.module.logic.replacer.LogicRemoveReplacer;
-import io.github.loserya.module.logic.replacer.LogicUpdateByIdReplacer;
 import io.github.loserya.utils.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -155,13 +151,7 @@ public class MogoConfiguration implements ApplicationContextAware {
         }
         this.logicProperty = logicProperty;
         this.interceptor(CollectionLogiceInterceptor.class);
-        this.replacer(
-                LogicGetByIdReplacer.class,
-                LogicListByIdsReplacer.class,
-                LogicRemoveByIdReplacer.class,
-                LogicRemoveReplacer.class,
-                LogicUpdateByIdReplacer.class
-        );
+        this.replacer(LogicRemoveReplacer.class);
         if (MogoEnableCache.autoFill) {
             this.interceptor(LogicAutoFillInterceptor.class);
         }

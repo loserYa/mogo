@@ -11,6 +11,7 @@ import io.github.loserya.module.datasource.MongoDs;
 import io.github.loserya.module.datasource.ServiceDataSourceProxy;
 import io.github.loserya.utils.AnnotationUtil;
 import io.github.loserya.utils.ClassUtil;
+import io.github.loserya.utils.QueryUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -77,7 +78,7 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     @Override
     public boolean removeById(I id) {
-        return baseMapper.removeById(id);
+        return baseMapper.remove(QueryUtils.buildEq(id, targetClass));
     }
 
     @Override
@@ -87,7 +88,7 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     @Override
     public boolean updateById(T entity) {
-        return baseMapper.updateById(entity);
+        return baseMapper.update(entity, QueryUtils.buildEq(entity, targetClass));
     }
 
     @Override
@@ -97,12 +98,12 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     @Override
     public T getById(I id) {
-        return baseMapper.getById(id);
+        return baseMapper.getOne(QueryUtils.buildEq(id, targetClass));
     }
 
     @Override
     public Collection<T> listByIds(Collection<I> idList) {
-        return baseMapper.listByIds(idList);
+        return baseMapper.list(QueryUtils.buildIn(idList, targetClass));
     }
 
     @Override

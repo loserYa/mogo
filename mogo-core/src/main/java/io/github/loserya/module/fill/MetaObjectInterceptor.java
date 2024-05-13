@@ -49,15 +49,6 @@ public class MetaObjectInterceptor implements Interceptor {
     }
 
     @Override
-    public Object[] updateById(Object entity, Class<?> clazz) {
-
-        handleFileByAnno(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
-        handlerMetaObject(false, entity, clazz);
-        return Interceptor.super.updateById(entity, clazz);
-
-    }
-
-    @Override
     public Object[] update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
 
         handleFileByAnno(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);

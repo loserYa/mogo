@@ -91,12 +91,12 @@ public class LambdaQueryWrapper<T>
     }
 
     @Override
-    public LambdaQueryWrapper<T> in(boolean condition, SFunction<T, ?> column, Collection<Object> val) {
+    public LambdaQueryWrapper<T> in(boolean condition, SFunction<T, ?> column, Collection val) {
         return in(condition, getFieldMeta(column), val);
     }
 
     @Override
-    public LambdaQueryWrapper<T> notIn(boolean condition, SFunction<T, ?> column, Collection<Object> val) {
+    public LambdaQueryWrapper<T> notIn(boolean condition, SFunction<T, ?> column, Collection val) {
         return notIn(condition, getFieldMeta(column), val);
     }
 
@@ -241,7 +241,7 @@ public class LambdaQueryWrapper<T>
     }
 
     @Override
-    public LambdaQueryWrapper<T> in(boolean condition, String column, Collection<Object> val) {
+    public LambdaQueryWrapper<T> in(boolean condition, String column, Collection val) {
         if (condition) {
             conditions.add(new Condition(ECompare.IN, column, Collections.singletonList(val)));
         }
@@ -249,7 +249,7 @@ public class LambdaQueryWrapper<T>
     }
 
     @Override
-    public LambdaQueryWrapper<T> notIn(boolean condition, String column, Collection<Object> val) {
+    public LambdaQueryWrapper<T> notIn(boolean condition, String column, Collection val) {
         if (condition) {
             conditions.add(new Condition(ECompare.NIN, column, Collections.singletonList(val)));
         }
