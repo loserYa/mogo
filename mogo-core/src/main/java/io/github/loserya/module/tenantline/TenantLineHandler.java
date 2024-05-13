@@ -16,7 +16,7 @@ public abstract class TenantLineHandler implements Interceptor {
      *
      * @return 租户 ID 值表达式
      */
-    abstract Object getTenantId();
+    public abstract Object getTenantId();
 
     /**
      * 获取租户字段名
@@ -24,7 +24,7 @@ public abstract class TenantLineHandler implements Interceptor {
      *
      * @return 租户字段名
      */
-    abstract String getTenantIdColumn();
+    public abstract String getTenantIdColumn();
 
     /**
      * 获取租户字段名
@@ -32,7 +32,7 @@ public abstract class TenantLineHandler implements Interceptor {
      *
      * @return 租户实体字段
      */
-    abstract String getTenantIdFiled();
+    public abstract String getTenantIdFiled();
 
     /**
      * 根据表名判断是否忽略拼接多租户条件
@@ -42,7 +42,7 @@ public abstract class TenantLineHandler implements Interceptor {
      * @param clazz 文档对象
      * @return 是否忽略, true:表示忽略，false:需要解析并拼接多租户条件
      */
-    abstract boolean ignoreCollection(Class<?> clazz);
+    public abstract boolean ignoreCollection(Class<?> clazz);
 
     @Override
     public final int order() {

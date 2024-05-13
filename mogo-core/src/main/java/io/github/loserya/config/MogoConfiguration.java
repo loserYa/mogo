@@ -16,6 +16,7 @@ import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
 import io.github.loserya.module.logic.replacer.LogicRemoveReplacer;
+import io.github.loserya.module.tenantline.TenantLineHandler;
 import io.github.loserya.utils.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +26,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -64,6 +66,20 @@ public class MogoConfiguration implements ApplicationContextAware {
         loadIocMeatFilHandlers(applicationContext);
         // 04 加载ID生成策略处理器
         loadIocIdGenStrategy(applicationContext);
+        // 05 检测租户拦截器
+        checkTenantLineHandler(applicationContext);
+
+    }
+
+    /**
+     * 检测租户拦截器
+     */
+    private void checkTenantLineHandler(ApplicationContext applicationContext) {
+
+        Collection<TenantLineHandler> values = applicationContext.getBeansOfType(TenantLineHandler.class).values();
+        if (values.size() > 1) {
+            throw ExceptionUtils.mpe("TenantLineHandler subClass must only one in IOC.");
+        }
 
     }
 
