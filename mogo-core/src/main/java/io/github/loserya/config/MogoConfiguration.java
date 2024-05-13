@@ -12,11 +12,12 @@ import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.fill.FieldFillHandler;
 import io.github.loserya.module.fill.MetaObjectHandler;
 import io.github.loserya.module.idgen.strategy.IdGenStrategy;
+import io.github.loserya.module.interceptor.datapermission.DataPermissionInterceptor;
+import io.github.loserya.module.interceptor.tenantline.TenantLineInterceptor;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
 import io.github.loserya.module.logic.replacer.LogicRemoveReplacer;
-import io.github.loserya.module.tenantline.TenantLineHandler;
 import io.github.loserya.utils.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,19 +67,22 @@ public class MogoConfiguration implements ApplicationContextAware {
         loadIocMeatFilHandlers(applicationContext);
         // 04 加载ID生成策略处理器
         loadIocIdGenStrategy(applicationContext);
-        // 05 检测租户拦截器
-        checkTenantLineHandler(applicationContext);
+        // 05 检测只能单个的拦截器
+        checkMustOneInterceptor(applicationContext, TenantLineInterceptor.class, DataPermissionInterceptor.class);
 
     }
 
     /**
-     * 检测租户拦截器
+     * 检测只能单个的拦截器
      */
-    private void checkTenantLineHandler(ApplicationContext applicationContext) {
+    @SafeVarargs
+    private final void checkMustOneInterceptor(ApplicationContext applicationContext, Class<? extends Interceptor>... classList) {
 
-        Collection<TenantLineHandler> values = applicationContext.getBeansOfType(TenantLineHandler.class).values();
-        if (values.size() > 1) {
-            throw ExceptionUtils.mpe("TenantLineHandler subClass must only one in IOC.");
+        for (Class<? extends Interceptor> clazz : classList) {
+            Collection<? extends Interceptor> values = applicationContext.getBeansOfType(clazz).values();
+            if (values.size() > 1) {
+                throw ExceptionUtils.mpe(String.format("%s subClass must only one in IOC.", clazz.getSimpleName()));
+            }
         }
 
     }

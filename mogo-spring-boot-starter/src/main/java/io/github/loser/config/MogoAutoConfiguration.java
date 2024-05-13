@@ -9,11 +9,11 @@ import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.module.fill.MetaObjectInterceptor;
-import io.github.loserya.module.fulltable.FullTableHandler;
 import io.github.loserya.module.idgen.strategy.impl.AutoStrategy;
 import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
 import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
 import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
+import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import org.bson.Document;
@@ -56,7 +56,7 @@ public class MogoAutoConfiguration {
 
     private void initBanFullTable() {
         if (MogoEnableCache.banFullTable) {
-            MogoConfiguration.instance().interceptor(FullTableHandler.class);
+            MogoConfiguration.instance().interceptor(FullTableInterceptor.class);
         }
     }
 

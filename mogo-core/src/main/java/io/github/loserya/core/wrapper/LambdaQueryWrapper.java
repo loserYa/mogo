@@ -15,6 +15,7 @@ import io.github.loserya.hardcode.constant.ESortType;
 import io.github.loserya.utils.ConvertUtil;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.func.SFunction;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,19 @@ public class LambdaQueryWrapper<T>
     private final List<SortCondition> sortConditions = new ArrayList<>(5);
     private Long skip;
     private Integer limit;
+
+    public void appendCondition(LambdaQueryWrapper<?> wrapper) {
+
+        if (Objects.isNull(wrapper) || CollectionUtils.isEmpty(wrapper.getConditions())) {
+            return;
+        }
+        this.getConditions().addAll(wrapper.getConditions());
+
+    }
+
+    public List<Condition> getConditions() {
+        return conditions;
+    }
 
     public int conditionsSize() {
         return conditions.size();

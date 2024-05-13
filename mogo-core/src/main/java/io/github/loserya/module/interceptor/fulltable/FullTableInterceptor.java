@@ -1,10 +1,10 @@
-package io.github.loserya.module.fulltable;
+package io.github.loserya.module.interceptor.fulltable;
 
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.utils.ExceptionUtils;
 
-public final class FullTableHandler implements Interceptor {
+public final class FullTableInterceptor implements Interceptor {
 
     @Override
     public int order() {

@@ -1,4 +1,4 @@
-package io.github.loserya.module.tenantline;
+package io.github.loserya.module.interceptor.tenantline;
 
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
 import io.github.loserya.function.interceptor.Interceptor;
@@ -8,7 +8,7 @@ import io.github.loserya.utils.ExceptionUtils;
 import java.lang.reflect.Field;
 import java.util.Collection;
 
-public abstract class TenantLineHandler implements Interceptor {
+public abstract class TenantLineInterceptor implements Interceptor {
 
     /**
      * 获取租户 ID 值表达式，只支持单个 ID 值
@@ -40,9 +40,9 @@ public abstract class TenantLineHandler implements Interceptor {
      * 默认都要进行解析并拼接多租户条件
      *
      * @param clazz 文档对象
-     * @return 是否忽略, true:表示忽略，false:需要解析并拼接多租户条件
+     * @return 是否忽略, true:需要解析并拼接多租户条件，false:标识忽略
      */
-    public abstract boolean ignoreCollection(Class<?> clazz);
+    public abstract boolean unIgnore(Class<?> clazz);
 
     @Override
     public final Object[] getOne(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
@@ -52,7 +52,7 @@ public abstract class TenantLineHandler implements Interceptor {
 
     @Override
     public final Object[] save(Object entity, Class<?> clazz) {
-        if (!ignoreCollection(clazz)) {
+        if (unIgnore(clazz)) {
             try {
                 Field field = ClassUtil.getFieldWitchCache(clazz, getTenantIdFiled());
                 field.set(entity, getTenantId());
@@ -65,7 +65,7 @@ public abstract class TenantLineHandler implements Interceptor {
 
     @Override
     public final Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
-        if (!ignoreCollection(clazz)) {
+        if (unIgnore(clazz)) {
             try {
                 Field field = ClassUtil.getFieldWitchCache(clazz, getTenantIdFiled());
                 for (Object entity : entityList) {
@@ -97,7 +97,7 @@ public abstract class TenantLineHandler implements Interceptor {
     }
 
     private void addTenantLineCondition(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
-        if (!ignoreCollection(clazz)) {
+        if (unIgnore(clazz)) {
             queryWrapper.eq(getTenantIdColumn(), getTenantId());
         }
     }
