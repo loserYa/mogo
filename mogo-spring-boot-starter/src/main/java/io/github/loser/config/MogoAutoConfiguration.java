@@ -7,7 +7,9 @@ import com.mongodb.client.MongoCursor;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
+import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.module.fill.MetaObjectInterceptor;
+import io.github.loserya.module.fulltable.FullTableHandler;
 import io.github.loserya.module.idgen.strategy.impl.AutoStrategy;
 import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
 import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
@@ -40,14 +42,22 @@ public class MogoAutoConfiguration {
         this.mogoDataSourceProperties = mogoDataSourceProperties;
         this.mogoLogicProperties = mogoLogicProperties;
         this.environment = environment;
-        // 初始化逻辑删除
+        // 01 初始化逻辑删除
         initLogic();
-        // 初始化动态数据源
+        // 02 初始化动态数据源
         initDynamicDatasource();
-        // 初始化自定填充
+        // 03 初始化自定填充
         initMetaFill();
-        // 初始化ID生成
+        // 04 初始化ID生成
         initIdGenStrategy();
+        // 05 初始化禁止全表跟新及删除
+        initBanFullTable();
+    }
+
+    private void initBanFullTable() {
+        if (MogoEnableCache.banFullTable) {
+            MogoConfiguration.instance().interceptor(FullTableHandler.class);
+        }
     }
 
     private void initIdGenStrategy() {

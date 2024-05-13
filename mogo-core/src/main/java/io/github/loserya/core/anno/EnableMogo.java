@@ -38,4 +38,9 @@ public @interface EnableMogo {
      */
     boolean dynamicDs() default false;
 
+    /**
+     * 禁止全表更新及全表删除
+     */
+    boolean banFullTable() default false;
+
 }

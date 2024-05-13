@@ -45,11 +45,6 @@ public abstract class TenantLineHandler implements Interceptor {
     public abstract boolean ignoreCollection(Class<?> clazz);
 
     @Override
-    public final int order() {
-        return Integer.MIN_VALUE;
-    }
-
-    @Override
     public final Object[] getOne(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         addTenantLineCondition(queryWrapper, clazz);
         return Interceptor.super.getOne(queryWrapper, clazz);

@@ -28,4 +28,9 @@ public class MogoEnableCache {
      */
     public static boolean dynamicDs = false;
 
+    /**
+     * 禁止全表更新及全表删除
+     */
+    public static boolean banFullTable = false;
+
 }

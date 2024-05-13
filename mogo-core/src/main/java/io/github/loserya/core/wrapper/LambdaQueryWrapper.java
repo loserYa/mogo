@@ -47,6 +47,10 @@ public class LambdaQueryWrapper<T>
     private Long skip;
     private Integer limit;
 
+    public int conditionsSize() {
+        return conditions.size();
+    }
+
     public ConditionWrapper getCondition() {
         return new ConditionWrapper(fields, conditions, sortConditions, skip, limit);
     }

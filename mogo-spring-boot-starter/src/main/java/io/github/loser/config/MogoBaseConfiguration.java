@@ -62,6 +62,7 @@ public class MogoBaseConfiguration {
             MogoEnableCache.logic = enableMogo.logic();
             MogoEnableCache.autoFill = enableMogo.autoFill();
             MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
+            MogoEnableCache.banFullTable = enableMogo.banFullTable();
         }
 
     }
@@ -99,6 +100,11 @@ public class MogoBaseConfiguration {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is enable");
         } else {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is unEnable");
+        }
+        if (MogoEnableCache.banFullTable) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is unEnable");
         }
 
     }
