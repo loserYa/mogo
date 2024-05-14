@@ -1,12 +1,14 @@
 package io.github.loserya.module.datasource;
 
-import io.github.loserya.core.sdk.MogoService;
+import io.github.loserya.core.proxy.MogoProxy;
 import io.github.loserya.global.cache.MethodDsCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 /**
@@ -16,12 +18,10 @@ import java.util.Objects;
  * @since 1.0.0
  */
 @SuppressWarnings("all")
-public class ServiceDataSourceProxy implements InvocationHandler {
+public class ServiceDataSourceProxy extends MogoProxy {
 
-    private MogoService target;
-
-    public ServiceDataSourceProxy(MogoService target) {
-        this.target = target;
+    public ServiceDataSourceProxy(Object target) {
+        super(target);
     }
 
     @Override
@@ -30,14 +30,15 @@ public class ServiceDataSourceProxy implements InvocationHandler {
         String key = method.getDeclaringClass().getName() + "." + method.getName();
         String value = MethodDsCache.CACHE.get(key);
         if (Objects.isNull(value)) {
-            value = getByAnnotation(method, key);
+            Class<?> clazz = getUnProxyClass(getTarget());
+            value = getByAnnotation(clazz.getMethod(method.getName(), method.getParameterTypes()), key);
         }
         boolean notNull = StringUtils.isNotBlank(value);
         try {
             if (notNull) {
                 MongoTemplateCache.setDataSource(value);
             }
-            return method.invoke(target, args);
+            return method.invoke(getTarget(), args);
         } finally {
             if (notNull) {
                 MongoTemplateCache.clear();
@@ -46,12 +47,26 @@ public class ServiceDataSourceProxy implements InvocationHandler {
 
     }
 
+    private Class<?> getUnProxyClass(Object target) {
+
+        if (!Proxy.isProxyClass(target.getClass())) {
+            return target.getClass();
+        }
+        InvocationHandler handler = Proxy.getInvocationHandler(target);
+        if (handler instanceof MogoProxy) {
+            return getUnProxyClass(((MogoProxy) handler).getTarget());
+        } else {
+            throw ExceptionUtils.mpe("Unknown proxy handler type");
+        }
+
+    }
+
     private String getByAnnotation(Method method, String key) throws NoSuchMethodException {
 
         String value;
-        MongoDs annotation = target.getClass().getMethod(method.getName(), method.getParameterTypes()).getAnnotation(MongoDs.class);
+        MongoDs annotation = method.getAnnotation(MongoDs.class);
         if (Objects.isNull(annotation)) {
-            annotation = target.getClass().getAnnotation(MongoDs.class);
+            annotation = method.getDeclaringClass().getAnnotation(MongoDs.class);
         }
         value = Objects.isNull(annotation) ? "" : annotation.value();
         MethodDsCache.CACHE.put(key, value);

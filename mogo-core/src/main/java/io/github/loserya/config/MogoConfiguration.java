@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Arrays;
@@ -153,6 +155,19 @@ public class MogoConfiguration implements ApplicationContextAware {
         MongoTemplateCache.CACHE.put(name, mongoTemplate);
         LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo init MongoTemplate finish { %s : %s }", name, mongoTemplate));
         return this;
+    }
+
+    public MogoConfiguration factory(String name, MongoDatabaseFactory mongoDatabaseFactory) {
+
+        MongoTemplateCache.FACTORY.put(name, mongoDatabaseFactory);
+        if (name.equals(MogoConstant.MASTER_DS)) {
+            MongoTemplateCache.MANAGER.put(name, new MongoTransactionManager(mongoDatabaseFactory));
+        } else {
+            MongoTemplateCache.MANAGER.put(name, new MongoTransactionManager(mongoDatabaseFactory));
+        }
+        LOGGER.info(MogoConstant.LOG_PRE + String.format("mogo init MongoDatabaseFactory finish { %s : %s }", name, mongoDatabaseFactory));
+        return this;
+
     }
 
     /**

@@ -33,4 +33,9 @@ public class MogoEnableCache {
      */
     public static boolean banFullTable = false;
 
+    /**
+     * 是否开启事务功能
+     */
+    public static boolean transaction = false;
+
 }

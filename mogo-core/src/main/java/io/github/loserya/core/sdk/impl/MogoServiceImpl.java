@@ -9,6 +9,8 @@ import io.github.loserya.global.BaseMapperContext;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.module.datasource.MongoDs;
 import io.github.loserya.module.datasource.ServiceDataSourceProxy;
+import io.github.loserya.module.transaction.MogoTransaction;
+import io.github.loserya.module.transaction.ServiceTransactionProxy;
 import io.github.loserya.utils.AnnotationUtil;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.QueryUtils;
@@ -133,11 +135,21 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
             return this;
         }
         Class<?> aClass = getObjectType();
-        boolean exist = AnnotationUtil.isExistMethodAndFunction(aClass, MongoDs.class);
-        if (exist) {
-            return Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), new ServiceDataSourceProxy(this));
+        MogoService service = this;
+        boolean exist = false;
+        if (MogoEnableCache.transaction) {
+            exist = AnnotationUtil.isExistMethodAndFunction(aClass, MogoTransaction.class);
+            if (exist) {
+                service = (MogoService) Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), new ServiceTransactionProxy(service));
+            }
         }
-        return this;
+        if (MogoEnableCache.dynamicDs) {
+            exist = AnnotationUtil.isExistMethodAndFunction(aClass, MongoDs.class);
+            if (exist) {
+                service = (MogoService) Proxy.newProxyInstance(aClass.getClassLoader(), aClass.getInterfaces(), new ServiceDataSourceProxy(service));
+            }
+        }
+        return service;
 
     }
 

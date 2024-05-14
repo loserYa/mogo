@@ -5,6 +5,7 @@ import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.core.anno.EnableMogo;
 import io.github.loserya.global.cache.MogoEnableCache;
+import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.AnnotationUtil;
 import org.apache.commons.logging.Log;
@@ -14,11 +15,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,20 +35,21 @@ public class MogoBaseConfiguration {
 
     private static final Log LOGGER = LogFactory.getLog(MogoBaseConfiguration.class);
     private final MongoTemplate mongoTemplate;
+    private final MongoDatabaseFactory mongoDatabaseFactory;
 
     public MogoBaseConfiguration(
             ApplicationContext applicationContext,
             MongoTemplate mongoTemplate,
             Environment environment,
             MogoDataSourceProperties mogoDataSourceProperties,
-            MogoLogicProperties mogoLogicProperties
+            MogoLogicProperties mogoLogicProperties,
+            MongoDatabaseFactory mongoDatabaseFactory
     ) {
         enableFun(applicationContext);
         logBaseInfo();
         this.mongoTemplate = mongoTemplate;
-        if (MogoEnableCache.dynamicDs) {
-            new MogoAutoConfiguration(environment, mogoLogicProperties, mogoDataSourceProperties);
-        }
+        this.mongoDatabaseFactory = mongoDatabaseFactory;
+        new MogoAutoConfiguration(environment, mogoLogicProperties, mogoDataSourceProperties);
 
     }
 
@@ -63,6 +67,7 @@ public class MogoBaseConfiguration {
             MogoEnableCache.autoFill = enableMogo.autoFill();
             MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
             MogoEnableCache.banFullTable = enableMogo.banFullTable();
+            MogoEnableCache.transaction = enableMogo.transaction();
         }
 
     }
@@ -114,6 +119,15 @@ public class MogoBaseConfiguration {
     public MogoConfiguration mogoConfiguration() {
 
         MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
+        if (MogoEnableCache.transaction) {
+            MogoConfiguration.instance().factory(MogoConstant.MASTER_DS, mongoDatabaseFactory);
+            for (Map.Entry<String, MongoTemplate> entry : MongoTemplateCache.CACHE.entrySet()) {
+                if (!Objects.equals(entry.getKey(), MogoConstant.MASTER_DS)) {
+                    MongoDatabaseFactory mongoDatabaseFactory = entry.getValue().getMongoDatabaseFactory();
+                    MogoConfiguration.instance().factory(entry.getKey(), mongoDatabaseFactory);
+                }
+            }
+        }
         return MogoConfiguration.instance();
 
     }

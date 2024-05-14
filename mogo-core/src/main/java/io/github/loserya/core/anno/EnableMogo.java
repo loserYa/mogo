@@ -43,4 +43,9 @@ public @interface EnableMogo {
      */
     boolean banFullTable() default false;
 
+    /**
+     * 是否开启事务功能
+     */
+    boolean transaction() default false;
+
 }
