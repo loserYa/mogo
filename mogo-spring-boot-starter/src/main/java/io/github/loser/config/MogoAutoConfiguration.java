@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.CollectionUtils;
 
@@ -35,16 +36,15 @@ public class MogoAutoConfiguration {
     @Bean
     @Order(Integer.MIN_VALUE)
     public MogoConfiguration mogoConfiguration(MongoTemplate mongoTemplate) {
-
         MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
         return MogoConfiguration.instance();
-
     }
 
     public MogoAutoConfiguration(
             Environment environment,
             ApplicationContext applicationContext,
             MogoLogicProperties mogoLogicProperties,
+            MongoDatabaseFactory mongoDatabaseFactory,
             MogoDataSourceProperties mogoDataSourceProperties
     ) {
         // 01 开启功能
@@ -52,7 +52,7 @@ public class MogoAutoConfiguration {
         // 02 输出启动日志
         logBaseInfo();
         // 03 进行 mogo 初始化操作
-        new MogoInitializer(environment, mogoLogicProperties, mogoDataSourceProperties);
+        new MogoInitializer(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
     }
 
     private static void enableFun(ApplicationContext applicationContext) {
@@ -69,6 +69,7 @@ public class MogoAutoConfiguration {
             MogoEnableCache.autoFill = enableMogo.autoFill();
             MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
             MogoEnableCache.banFullTable = enableMogo.banFullTable();
+            MogoEnableCache.transaction = enableMogo.transaction();
         }
 
     }
@@ -110,6 +111,11 @@ public class MogoAutoConfiguration {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is enable");
         } else {
             LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is unEnable");
+        }
+        if (MogoEnableCache.transaction) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [transaction] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [transaction] switch is unEnable");
         }
 
     }

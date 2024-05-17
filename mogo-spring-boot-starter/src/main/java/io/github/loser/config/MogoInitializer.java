@@ -8,6 +8,8 @@ import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.global.cache.MogoEnableCache;
+import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.fill.MetaObjectInterceptor;
 import io.github.loserya.module.idgen.strategy.impl.AutoStrategy;
 import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
@@ -22,11 +24,13 @@ import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCu
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoPropertiesClientSettingsBuilderCustomizer;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * mogo 初始化器
@@ -37,15 +41,18 @@ import java.util.Map;
 public class MogoInitializer {
 
     private final MogoDataSourceProperties mogoDataSourceProperties;
+    private final MongoDatabaseFactory mongoDatabaseFactory;
     private final MogoLogicProperties mogoLogicProperties;
     private final Environment environment;
 
     public MogoInitializer(
             Environment environment,
             MogoLogicProperties mogoLogicProperties,
+            MongoDatabaseFactory mongoDatabaseFactory,
             MogoDataSourceProperties mogoDataSourceProperties
     ) {
         this.mogoDataSourceProperties = mogoDataSourceProperties;
+        this.mongoDatabaseFactory = mongoDatabaseFactory;
         this.mogoLogicProperties = mogoLogicProperties;
         this.environment = environment;
         // 01 初始化逻辑删除
@@ -58,6 +65,23 @@ public class MogoInitializer {
         initIdGenStrategy();
         // 05 初始化禁止全表跟新及删除
         initBanFullTable();
+        // 06 初始化事务
+        initTransaction();
+    }
+
+    private void initTransaction() {
+
+        if (!MogoEnableCache.transaction) {
+            return;
+        }
+        MogoConfiguration.instance().factory(MogoConstant.MASTER_DS, mongoDatabaseFactory);
+        for (Map.Entry<String, MongoTemplate> entry : MongoTemplateCache.CACHE.entrySet()) {
+            if (!Objects.equals(entry.getKey(), MogoConstant.MASTER_DS)) {
+                MongoDatabaseFactory factory = entry.getValue().getMongoDatabaseFactory();
+                MogoConfiguration.instance().factory(entry.getKey(), factory);
+            }
+        }
+
     }
 
     private void initBanFullTable() {
