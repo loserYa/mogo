@@ -1,113 +1,118 @@
 package io.github.loser.config;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.ListDatabasesIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCursor;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
+import io.github.loserya.core.anno.EnableMogo;
 import io.github.loserya.global.cache.MogoEnableCache;
-import io.github.loserya.module.fill.MetaObjectInterceptor;
-import io.github.loserya.module.idgen.strategy.impl.AutoStrategy;
-import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
-import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
-import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
-import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
-import io.github.loserya.utils.ExceptionUtils;
-import io.github.loserya.utils.StringUtils;
-import org.bson.Document;
-import org.springframework.boot.autoconfigure.mongo.MongoClientFactory;
-import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoPropertiesClientSettingsBuilderCustomizer;
+import io.github.loserya.hardcode.constant.MogoConstant;
+import io.github.loserya.utils.AnnotationUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
+/**
+ * 基础必要配置
+ *
+ * @author loser
+ * @since 1.0.0
+ */
+@EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
 public class MogoAutoConfiguration {
 
-    private final MogoDataSourceProperties mogoDataSourceProperties;
-    private final MogoLogicProperties mogoLogicProperties;
-    private final Environment environment;
+    private static final Log LOGGER = LogFactory.getLog(MogoAutoConfiguration.class);
+
+    @Bean
+    @Order(Integer.MIN_VALUE)
+    public MogoConfiguration mogoConfiguration(MongoTemplate mongoTemplate) {
+
+        MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
+        return MogoConfiguration.instance();
+
+    }
 
     public MogoAutoConfiguration(
             Environment environment,
+            ApplicationContext applicationContext,
             MogoLogicProperties mogoLogicProperties,
             MogoDataSourceProperties mogoDataSourceProperties
     ) {
-        this.mogoDataSourceProperties = mogoDataSourceProperties;
-        this.mogoLogicProperties = mogoLogicProperties;
-        this.environment = environment;
-        // 01 初始化逻辑删除
-        initLogic();
-        // 02 初始化动态数据源
-        initDynamicDatasource();
-        // 03 初始化自定填充
-        initMetaFill();
-        // 04 初始化ID生成
-        initIdGenStrategy();
-        // 05 初始化禁止全表跟新及删除
-        initBanFullTable();
+        // 01 开启功能
+        enableFun(applicationContext);
+        // 02 输出启动日志
+        logBaseInfo();
+        // 03 进行 mogo 初始化操作
+        new MogoInitializer(environment, mogoLogicProperties, mogoDataSourceProperties);
     }
 
-    private void initBanFullTable() {
-        if (MogoEnableCache.banFullTable) {
-            MogoConfiguration.instance().interceptor(FullTableInterceptor.class);
+    private static void enableFun(ApplicationContext applicationContext) {
+
+        List<Object> beans = new ArrayList<>(applicationContext.getBeansWithAnnotation(EnableMogo.class).values());
+        if (CollectionUtils.isEmpty(beans)) {
+            return;
         }
+        Object o = beans.get(0);
+        EnableMogo enableMogo = AnnotationUtil.getAnnotation(o.getClass(), EnableMogo.class);
+        if (Objects.nonNull(enableMogo)) {
+            MogoEnableCache.base = enableMogo.base();
+            MogoEnableCache.logic = enableMogo.logic();
+            MogoEnableCache.autoFill = enableMogo.autoFill();
+            MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
+            MogoEnableCache.banFullTable = enableMogo.banFullTable();
+        }
+
     }
 
-    private void initIdGenStrategy() {
+    private void logBaseInfo() {
 
-        MogoConfiguration.instance().idGenStrategy(
-                AutoStrategy.class,
-                SnowStrategy.class,
-                ULIDStrategy.class,
-                UUIDStrategy.class
+        System.out.println(
+                "  __  __    ____     _____    ____  \n" +
+                        " |  \\/  |  / __ \\   / ____|  / __ \\ \n" +
+                        " | \\  / | | |  | | | |  __  | |  | |\n" +
+                        " | |\\/| | | |  | | | | |_ | | |  | |\n" +
+                        " | |  | | | |__| | | |__| | | |__| |\n" +
+                        " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-
-    }
-
-    private void initMetaFill() {
-        MogoConfiguration.instance().interceptor(MetaObjectInterceptor.class);
-    }
-
-    private void initDynamicDatasource() {
-
-        for (Map.Entry<String, MongoProperties> entry : mogoDataSourceProperties.getDatasource().entrySet()) {
-            MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue());
-            MogoConfiguration.instance().template(entry.getKey(), template);
+        System.out.println(":: Mogo starting ::           v1.0.0");
+        System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
+        System.out.println();
+        if (MogoEnableCache.base) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is unEnable");
+        }
+        if (MogoEnableCache.logic) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is unEnable");
+        }
+        if (MogoEnableCache.autoFill) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is unEnable");
+        }
+        if (MogoEnableCache.dynamicDs) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is unEnable");
+        }
+        if (MogoEnableCache.banFullTable) {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is enable");
+        } else {
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is unEnable");
         }
 
     }
 
-    private void initLogic() {
-        MogoConfiguration.instance().logic(mogoLogicProperties);
-    }
-
-    private MongoTemplate buildTemplate(String ds, MongoProperties properties) {
-
-        MongoPropertiesClientSettingsBuilderCustomizer customizer = new MongoPropertiesClientSettingsBuilderCustomizer(properties, environment);
-        List<MongoClientSettingsBuilderCustomizer> builderCustomizers = Collections.singletonList(customizer);
-        MongoClientSettings settings = MongoClientSettings.builder().build();
-        MongoClientFactory mongoClientFactory = new MongoClientFactory(builderCustomizers);
-        MongoClient mongoClient = mongoClientFactory.createMongoClient(settings);
-        ListDatabasesIterable<Document> documents = mongoClient.listDatabases();
-        String db = "";
-        MongoCursor<Document> iterator = documents.iterator();
-        // 只需要一个 使用 if
-        if (iterator.hasNext()) {
-            Document next = iterator.next();
-            db = next.get("name").toString();
-        }
-        if (StringUtils.isBlank(db)) {
-            throw ExceptionUtils.mpe(String.format("dynamic datasource [%s] dataBase is null", ds));
-        }
-        return new MongoTemplate(mongoClient, db);
-
-    }
 
 }
