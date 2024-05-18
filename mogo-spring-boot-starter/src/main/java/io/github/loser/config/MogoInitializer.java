@@ -1,9 +1,7 @@
 package io.github.loser.config;
 
 import com.mongodb.MongoClientSettings;
-import com.mongodb.client.ListDatabasesIterable;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCursor;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
@@ -18,7 +16,6 @@ import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
 import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
-import org.bson.Document;
 import org.springframework.boot.autoconfigure.mongo.MongoClientFactory;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
@@ -138,13 +135,15 @@ public class MogoInitializer {
         MongoClientSettings settings = MongoClientSettings.builder().build();
         MongoClientFactory mongoClientFactory = new MongoClientFactory(builderCustomizers);
         MongoClient mongoClient = mongoClientFactory.createMongoClient(settings);
-        ListDatabasesIterable<Document> documents = mongoClient.listDatabases();
-        String db = "";
-        MongoCursor<Document> iterator = documents.iterator();
-        // 只需要一个 使用 if
-        if (iterator.hasNext()) {
-            Document next = iterator.next();
-            db = next.get("name").toString();
+        String db = properties.getDatabase();
+        if (StringUtils.isBlank(db)) {
+            String uri = properties.getUri();
+            if (StringUtils.isNotBlank(uri)) {
+                String[] split = uri.split("/");
+                if (split.length >= 4) {
+                    db = split[3].split("\\?")[0];
+                }
+            }
         }
         if (StringUtils.isBlank(db)) {
             throw ExceptionUtils.mpe(String.format("dynamic datasource [%s] dataBase is null", ds));
