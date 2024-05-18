@@ -37,12 +37,31 @@ import java.util.Objects;
  */
 public class MogoInitializer {
 
+    private static MogoInitializer initializer;
     private final MogoDataSourceProperties mogoDataSourceProperties;
     private final MongoDatabaseFactory mongoDatabaseFactory;
     private final MogoLogicProperties mogoLogicProperties;
     private final Environment environment;
 
-    public MogoInitializer(
+    protected static void init(
+            Environment environment,
+            MogoLogicProperties mogoLogicProperties,
+            MongoDatabaseFactory mongoDatabaseFactory,
+            MogoDataSourceProperties mogoDataSourceProperties
+
+    ) {
+        if (Objects.nonNull(initializer)) {
+            return;
+        }
+        synchronized (MogoInitializer.class) {
+            if (Objects.nonNull(initializer)) {
+                return;
+            }
+            initializer = new MogoInitializer(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
+        }
+    }
+
+    private MogoInitializer(
             Environment environment,
             MogoLogicProperties mogoLogicProperties,
             MongoDatabaseFactory mongoDatabaseFactory,

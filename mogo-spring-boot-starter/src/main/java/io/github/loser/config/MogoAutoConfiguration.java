@@ -52,7 +52,7 @@ public class MogoAutoConfiguration {
         // 02 输出启动日志
         logBaseInfo();
         // 03 进行 mogo 初始化操作
-        new MogoInitializer(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
+        MogoInitializer.init(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
     }
 
     private static void enableFun(ApplicationContext applicationContext) {
