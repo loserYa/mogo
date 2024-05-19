@@ -16,7 +16,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.util.CollectionUtils;
+import io.github.loserya.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

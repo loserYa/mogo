@@ -15,7 +15,7 @@ import io.github.loserya.hardcode.constant.ESortType;
 import io.github.loserya.utils.ConvertUtil;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.func.SFunction;
-import org.springframework.util.CollectionUtils;
+import io.github.loserya.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
