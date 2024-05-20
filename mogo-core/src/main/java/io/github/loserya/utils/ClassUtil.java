@@ -1,17 +1,13 @@
 package io.github.loserya.utils;
 
 import org.springframework.data.annotation.Id;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -123,12 +119,27 @@ public class ClassUtil {
         if (Objects.nonNull(result)) {
             return result;
         }
-        Type aClass = obj.getClass().getGenericSuperclass();
-        Type subType = ((ParameterizedTypeImpl) aClass).getActualTypeArguments()[1];
-        result = (Class<?>) subType;
+        result = getGenericClass(obj.getClass(), 1);
         CACHE.put(clazz, result);
         return result;
 
+    }
+
+    public static Class<?> getGenericClass(Class<?> clazz, int index) {
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        if (!(genericSuperclass instanceof ParameterizedType)) {
+            return Object.class; // 若未指定泛型类型，则返回 Object.class
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        if (index >= actualTypeArguments.length || index < 0) {
+            throw new IllegalArgumentException("Index out of bounds");
+        }
+        if (actualTypeArguments[index] instanceof Class) {
+            return (Class<?>) actualTypeArguments[index];
+        } else {
+            return Object.class; // 若泛型参数不是 Class 类型，则返回 Object.class
+        }
     }
 
     private static final Set<String> OBJ_METHOD;
