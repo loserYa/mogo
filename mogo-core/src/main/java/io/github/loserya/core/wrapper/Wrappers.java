@@ -8,6 +8,10 @@ package io.github.loserya.core.wrapper;
 public final class Wrappers {
 
     public static <T> LambdaQueryWrapper<T> lambdaQuery() {
+        return empty();
+    }
+
+    public static <T> LambdaQueryWrapper<T> empty() {
         return new LambdaQueryWrapper<>();
     }
 

@@ -1,5 +1,7 @@
 package io.github.loser.config;
 
+import io.github.loser.aspect.MogoDSAspect;
+import io.github.loser.aspect.MogoTSAspect;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
@@ -7,6 +9,7 @@ import io.github.loserya.core.anno.EnableMogo;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.AnnotationUtil;
+import io.github.loserya.utils.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +19,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,16 @@ import java.util.Objects;
 public class MogoAutoConfiguration {
 
     private static final Log LOGGER = LogFactory.getLog(MogoAutoConfiguration.class);
+
+    @Bean
+    public MogoDSAspect mogoDSAspect() {
+        return new MogoDSAspect();
+    }
+
+    @Bean
+    public MogoTSAspect mogoTSAspect() {
+        return new MogoTSAspect();
+    }
 
     @Bean
     @Order(Integer.MIN_VALUE)
@@ -84,9 +96,9 @@ public class MogoAutoConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.0");
+        System.out.println(":: Mogo starting ::           v1.1.2");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
-        System.out.println(":: doc           ::           http://mogo.loser.plus");
+        System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");
         System.out.println();
         if (MogoEnableCache.base) {

@@ -40,6 +40,15 @@ public interface MogoService<I extends Serializable, T> {
      */
     boolean save(T entity);
 
+
+    /**
+     * 保存或者更新数据
+     *
+     * @param entity 需要保存或者更新实体
+     * @return 是否保存或更新成功成功
+     */
+    boolean saveOrUpdate(T entity);
+
     /**
      * 批量保存新的数据 内部递归调用单个保存
      *
@@ -114,6 +123,13 @@ public interface MogoService<I extends Serializable, T> {
     List<T> list(LambdaQueryWrapper<T> queryWrapper);
 
     /**
+     * 查询列表
+     *
+     * @return 数据集合
+     */
+    List<T> list();
+
+    /**
      * 通过条件构建起进行分页查询
      *
      * @param queryWrapper 条件构建器
@@ -130,5 +146,13 @@ public interface MogoService<I extends Serializable, T> {
      * @return 是否存在数据
      */
     boolean exist(LambdaQueryWrapper<T> queryWrapper);
+
+    /**
+     * 通过ID判断数据是否存在
+     *
+     * @param id 数据 ID
+     * @return 是否存在数据
+     */
+    boolean existById(I id);
 
 }

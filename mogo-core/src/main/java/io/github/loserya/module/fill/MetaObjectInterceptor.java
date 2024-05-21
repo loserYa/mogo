@@ -10,7 +10,7 @@ import io.github.loserya.module.fill.hardcode.FieldFill;
 import io.github.loserya.module.idgen.IdGenHandler;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.ExceptionUtils;
-import org.springframework.util.CollectionUtils;
+import io.github.loserya.utils.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
