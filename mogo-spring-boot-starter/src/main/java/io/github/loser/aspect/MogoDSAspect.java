@@ -1,10 +1,17 @@
-package io.github.loserya.module.datasource;
+package io.github.loser.aspect;
 
 import io.github.loserya.core.proxy.MogoProxy;
 import io.github.loserya.global.cache.MethodDsCache;
+import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.module.datasource.MongoDs;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -12,25 +19,28 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 /**
- * 服务类数据源切换代理类
+ * 数据源切面
  *
  * @author loser
- * @since 1.0.0
+ * @since 1.1.2
  */
-@SuppressWarnings("all")
-public class ServiceDataSourceProxy extends MogoProxy {
+@Aspect
+@Order(0)
+public class MogoDSAspect {
 
-    public ServiceDataSourceProxy(Object target) {
-        super(target);
-    }
+    @Around("@annotation(io.github.loserya.module.datasource.MongoDs)")
+    public Object manageDataSource(ProceedingJoinPoint joinPoint) throws Throwable {
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
+        if (!MogoEnableCache.dynamicDs) {
+            return joinPoint.proceed();
+        }
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
         String key = method.getDeclaringClass().getName() + "." + method.getName();
         String value = MethodDsCache.CACHE.get(key);
         if (Objects.isNull(value)) {
-            Class<?> clazz = getUnProxyClass(getTarget());
+            Object target = joinPoint.getTarget();
+            Class<?> clazz = getUnProxyClass(target);
             value = getByAnnotation(clazz.getMethod(method.getName(), method.getParameterTypes()), key);
         }
         boolean notNull = StringUtils.isNotBlank(value);
@@ -38,7 +48,7 @@ public class ServiceDataSourceProxy extends MogoProxy {
             if (notNull) {
                 MongoTemplateCache.setDataSource(value);
             }
-            return method.invoke(getTarget(), args);
+            return joinPoint.proceed();
         } finally {
             if (notNull) {
                 MongoTemplateCache.clear();
@@ -61,7 +71,7 @@ public class ServiceDataSourceProxy extends MogoProxy {
 
     }
 
-    private String getByAnnotation(Method method, String key) throws NoSuchMethodException {
+    private String getByAnnotation(Method method, String key) {
 
         String value;
         MongoDs annotation = method.getAnnotation(MongoDs.class);
