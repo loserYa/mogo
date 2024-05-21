@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 默认的服务实现类
@@ -62,6 +63,23 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     @Override
     public boolean save(T entity) {
         return baseMapper.save(entity);
+    }
+
+    @Override
+    public boolean saveOrUpdate(T entity) {
+
+        Serializable id = ClassUtil.getId(entity);
+        if (Objects.isNull(id)) {
+            return save(entity);
+        } else {
+            T byId = getById((I) id);
+            if (Objects.isNull(byId)) {
+                return save(entity);
+            } else {
+                return updateById(entity);
+            }
+        }
+
     }
 
     @Override
