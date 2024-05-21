@@ -96,9 +96,9 @@ public class MogoAutoConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.0");
+        System.out.println(":: Mogo starting ::           v1.1.2");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
-        System.out.println(":: doc           ::           http://mogo.loser.plus");
+        System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");
         System.out.println();
         if (MogoEnableCache.base) {
