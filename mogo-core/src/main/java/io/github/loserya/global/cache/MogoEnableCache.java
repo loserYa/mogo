@@ -11,7 +11,7 @@ public class MogoEnableCache {
     /**
      * 是否开启基础功能
      */
-    public static boolean base = false;
+    public static boolean base = true;
 
     /**
      * 是否开启逻辑删除功能

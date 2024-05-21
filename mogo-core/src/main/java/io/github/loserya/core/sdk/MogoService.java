@@ -114,6 +114,13 @@ public interface MogoService<I extends Serializable, T> {
     List<T> list(LambdaQueryWrapper<T> queryWrapper);
 
     /**
+     * 查询列表
+     *
+     * @return 数据集合
+     */
+    List<T> list();
+
+    /**
      * 通过条件构建起进行分页查询
      *
      * @param queryWrapper 条件构建器
@@ -130,5 +137,13 @@ public interface MogoService<I extends Serializable, T> {
      * @return 是否存在数据
      */
     boolean exist(LambdaQueryWrapper<T> queryWrapper);
+
+    /**
+     * 通过ID判断数据是否存在
+     *
+     * @param id 数据 ID
+     * @return 是否存在数据
+     */
+    boolean existById(I id);
 
 }

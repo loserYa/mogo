@@ -21,7 +21,7 @@ public @interface EnableMogo {
     /**
      * 是否开启基础功能
      */
-    boolean base() default false;
+    boolean base() default true;
 
     /**
      * 是否开启逻辑删除功能

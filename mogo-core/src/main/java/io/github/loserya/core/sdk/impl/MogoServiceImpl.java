@@ -5,6 +5,7 @@ import io.github.loserya.core.entity.Page;
 import io.github.loserya.core.sdk.MogoService;
 import io.github.loserya.core.sdk.mapper.BaseMapper;
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
+import io.github.loserya.core.wrapper.Wrappers;
 import io.github.loserya.global.BaseMapperContext;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.QueryUtils;
@@ -109,6 +110,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     }
 
     @Override
+    public List<T> list() {
+        return baseMapper.list(Wrappers.empty());
+    }
+
+    @Override
     public Page<T> page(LambdaQueryWrapper<T> queryWrapper, int pageNo, int pageSize) {
         return baseMapper.page(queryWrapper, pageNo, pageSize);
     }
@@ -116,6 +122,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     @Override
     public boolean exist(LambdaQueryWrapper<T> queryWrapper) {
         return baseMapper.exist(queryWrapper);
+    }
+
+    @Override
+    public boolean existById(I id) {
+        return baseMapper.exist(QueryUtils.buildEq(id, targetClass));
     }
 
 }
