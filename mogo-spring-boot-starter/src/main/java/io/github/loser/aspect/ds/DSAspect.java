@@ -1,4 +1,4 @@
-package io.github.loser.aspect;
+package io.github.loser.aspect.ds;
 
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
@@ -6,28 +6,18 @@ import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.datasource.MongoDs;
 import io.github.loserya.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.core.annotation.Order;
 
-/**
- * 数据源切面
- *
- * @author loser
- * @since 1.1.2
- */
-@Aspect
-@Order(0)
-public class MogoDSAspect {
+import java.util.Objects;
 
-    @Around("execution(* *(..)) && @within(mongoDs)")
-    public Object manageDataSource(ProceedingJoinPoint joinPoint, MongoDs mongoDs) throws Throwable {
+public class DSAspect {
+
+    public Object invoke(ProceedingJoinPoint joinPoint, MongoDs mongoDs) throws Throwable {
 
         if (!MogoEnableCache.dynamicDs) {
             return joinPoint.proceed();
         }
         String lastDs = MongoTemplateCache.getDataSource();
-        String value = mongoDs.value();
+        String value = Objects.isNull(mongoDs) ? null : mongoDs.value();
         boolean notNull = StringUtils.isNotBlank(value);
         try {
             if (notNull) {
@@ -45,6 +35,5 @@ public class MogoDSAspect {
         }
 
     }
-
 
 }

@@ -75,16 +75,6 @@ public interface BaseMapper<I extends Serializable, T> {
      * @param pageSize     页面大小
      * @return 分页对象
      */
-    Page<T> page(LambdaQueryWrapper<T> queryWrapper, int pageNo, int pageSize);
-
-    /**
-     * 通过条件构建起进行分页查询
-     *
-     * @param queryWrapper 条件构建器
-     * @param pageNo       页面
-     * @param pageSize     页面大小
-     * @return 分页对象
-     */
     Page<T> page(LambdaQueryWrapper<T> queryWrapper, long pageNo, long pageSize);
 
     /**

@@ -90,7 +90,7 @@ public interface Interceptor {
      * @param pageSize     页面大小
      * @return 分页对象
      */
-    default Object[] page(LambdaQueryWrapper<?> queryWrapper, int pageNo, int pageSize, Class<?> clazz) {
+    default Object[] page(LambdaQueryWrapper<?> queryWrapper, Long pageNo, Long pageSize, Class<?> clazz) {
         return build(queryWrapper, pageNo, pageSize);
     }
 

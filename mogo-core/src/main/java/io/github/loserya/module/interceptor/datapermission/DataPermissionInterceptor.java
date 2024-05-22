@@ -71,7 +71,7 @@ public abstract class DataPermissionInterceptor implements Interceptor {
     }
 
     @Override
-    public final Object[] page(LambdaQueryWrapper<?> queryWrapper, int pageNo, int pageSize, Class<?> clazz) {
+    public final Object[] page(LambdaQueryWrapper<?> queryWrapper, Long pageNo, Long pageSize, Class<?> clazz) {
         appendCondition(queryWrapper, clazz);
         return Interceptor.super.page(queryWrapper, pageNo, pageSize, clazz);
     }

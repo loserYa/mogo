@@ -36,7 +36,7 @@ public class CollectionLogiceInterceptor implements Interceptor {
     }
 
     @Override
-    public Object[] page(LambdaQueryWrapper<?> queryWrapper, int pageNo, int pageSize, Class<?> clazz) {
+    public Object[] page(LambdaQueryWrapper<?> queryWrapper, Long pageNo, Long pageSize, Class<?> clazz) {
         return appendLogicCondition(clazz, 0, queryWrapper, pageNo, pageNo);
     }
 

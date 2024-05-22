@@ -1,7 +1,9 @@
 package io.github.loser.config;
 
-import io.github.loser.aspect.MogoDSAspect;
-import io.github.loser.aspect.MogoTSAspect;
+import io.github.loser.aspect.ds.MogoDSClassAspect;
+import io.github.loser.aspect.ds.MogoDSMethodAspect;
+import io.github.loser.aspect.ts.MogoTSClassAspect;
+import io.github.loser.aspect.ts.MogoTSMethodAspect;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
@@ -36,13 +38,23 @@ public class MogoAutoConfiguration {
     private static final Log LOGGER = LogFactory.getLog(MogoAutoConfiguration.class);
 
     @Bean
-    public MogoDSAspect mogoDSAspect() {
-        return new MogoDSAspect();
+    public MogoDSClassAspect mogoDSClassAspect() {
+        return new MogoDSClassAspect();
     }
 
     @Bean
-    public MogoTSAspect mogoTSAspect() {
-        return new MogoTSAspect();
+    public MogoTSClassAspect mogoTSClassAspect() {
+        return new MogoTSClassAspect();
+    }
+
+    @Bean
+    public MogoDSMethodAspect mogoDSMethodAspect() {
+        return new MogoDSMethodAspect();
+    }
+
+    @Bean
+    public MogoTSMethodAspect mogoTSMethodAspect() {
+        return new MogoTSMethodAspect();
     }
 
     @Bean

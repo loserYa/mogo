@@ -1,13 +1,10 @@
-package io.github.loser.aspect;
+package io.github.loser.aspect.ts;
 
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.module.transaction.MogoTransaction;
 import io.github.loserya.utils.ExceptionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.core.annotation.Order;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -16,12 +13,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author loser
  * @since 1.1.2
  */
-@Aspect
-@Order(0)
-public class MogoTSAspect {
+public class TSAspect {
 
-    @Around("execution(* *(..)) && @within(mogoTransaction)")
-    public Object manageTransaction(ProceedingJoinPoint joinPoint, MogoTransaction mogoTransaction) throws Throwable {
+    public Object invoke(ProceedingJoinPoint joinPoint, MogoTransaction mogoTransaction) throws Throwable {
 
         if (!MogoEnableCache.transaction) {
             return joinPoint.proceed();
