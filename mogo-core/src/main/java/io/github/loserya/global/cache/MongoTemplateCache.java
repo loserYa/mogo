@@ -35,9 +35,6 @@ public class MongoTemplateCache {
     public static String getDataSource() {
 
         String ds = dataSource.get();
-        if (MogoEnableCache.debugLog) {
-            LOGGER.info(MogoConstant.LOG_PRE + String.format("getDataSource [%s]", ds));
-        }
         if (StringUtils.isBlank(ds)) {
             ds = MogoConstant.MASTER_DS;
         }
