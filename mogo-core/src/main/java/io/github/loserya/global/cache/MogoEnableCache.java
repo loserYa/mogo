@@ -38,4 +38,9 @@ public class MogoEnableCache {
      */
     public static boolean transaction = false;
 
+    /**
+     * 是否开启 debug 日志 (建议测试环境临时开启、杜绝线上开启)
+     */
+    public static boolean debugLog = false;
+
 }

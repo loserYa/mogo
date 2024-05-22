@@ -35,6 +35,9 @@ public class MongoTemplateCache {
     public static String getDataSource() {
 
         String ds = dataSource.get();
+        if (MogoEnableCache.debugLog) {
+            LOGGER.info(MogoConstant.LOG_PRE + String.format("getDataSource [%s]", ds));
+        }
         if (StringUtils.isBlank(ds)) {
             ds = MogoConstant.MASTER_DS;
         }
@@ -49,7 +52,9 @@ public class MongoTemplateCache {
     public static MongoTemplate getMongoTemplate() {
 
         String ds = getDataSource();
-        LOGGER.info(String.format("getMongoTemplate [%s]", ds));
+        if (MogoEnableCache.debugLog) {
+            LOGGER.info(MogoConstant.LOG_PRE + String.format("getMongoTemplate [%s]", ds));
+        }
         MongoTemplate mongoTemplate = CACHE.get(ds);
         if (Objects.isNull(mongoTemplate)) {
             throw ExceptionUtils.mpe(String.format("ds: %s mongoTemplate un exist", ds));
@@ -70,6 +75,9 @@ public class MongoTemplateCache {
     public static MongoDatabaseFactory getFactory() {
 
         String ds = getDataSource();
+        if (MogoEnableCache.debugLog) {
+            LOGGER.info(MogoConstant.LOG_PRE + String.format("getFactory [%s]", ds));
+        }
         MongoDatabaseFactory factory = FACTORY.get(ds);
         if (Objects.isNull(factory)) {
             throw ExceptionUtils.mpe(String.format("ds: %s factory un exist", ds));

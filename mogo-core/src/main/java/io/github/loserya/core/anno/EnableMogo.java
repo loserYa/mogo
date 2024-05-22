@@ -48,4 +48,9 @@ public @interface EnableMogo {
      */
     boolean transaction() default false;
 
+    /**
+     * 是否开启 debug 日志 (建议测试环境临时开启、杜绝线上开启)
+     */
+    boolean debugLog() default false;
+
 }

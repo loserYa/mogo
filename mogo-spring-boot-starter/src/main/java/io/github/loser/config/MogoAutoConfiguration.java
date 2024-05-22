@@ -82,6 +82,7 @@ public class MogoAutoConfiguration {
             MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
             MogoEnableCache.banFullTable = enableMogo.banFullTable();
             MogoEnableCache.transaction = enableMogo.transaction();
+            MogoEnableCache.debugLog = enableMogo.debugLog();
         }
 
     }

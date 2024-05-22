@@ -48,7 +48,6 @@ public class MogoInitializer {
             MogoLogicProperties mogoLogicProperties,
             MongoDatabaseFactory mongoDatabaseFactory,
             MogoDataSourceProperties mogoDataSourceProperties
-
     ) {
         if (Objects.nonNull(initializer)) {
             return;
