@@ -26,12 +26,12 @@ public class Page<T> {
     /**
      * 每页显示条数，默认 10
      */
-    private int pageSize = 10;
+    private long pageSize = 10;
 
     /**
      * 当前页
      */
-    private int pageNum = 1;
+    private long pageNum = 1;
 
     public List<T> getRecords() {
         return records;
@@ -49,19 +49,19 @@ public class Page<T> {
         this.total = total;
     }
 
-    public int getPageSize() {
+    public long getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public void setPageSize(long pageSize) {
         this.pageSize = pageSize;
     }
 
-    public int getPageNum() {
+    public long getPageNum() {
         return pageNum;
     }
 
-    public void setPageNum(int pageNum) {
+    public void setPageNum(long pageNum) {
         this.pageNum = pageNum;
     }
 }

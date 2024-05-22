@@ -138,6 +138,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     }
 
     @Override
+    public Page<T> page(LambdaQueryWrapper<T> queryWrapper, long pageNo, long pageSize) {
+        return baseMapper.page(queryWrapper, pageNo, pageSize);
+    }
+
+    @Override
     public boolean exist(LambdaQueryWrapper<T> queryWrapper) {
         return baseMapper.exist(queryWrapper);
     }

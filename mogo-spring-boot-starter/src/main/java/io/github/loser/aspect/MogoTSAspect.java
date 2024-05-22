@@ -2,6 +2,7 @@ package io.github.loser.aspect;
 
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.module.transaction.MogoTransaction;
 import io.github.loserya.utils.ExceptionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,8 +20,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Order(0)
 public class MogoTSAspect {
 
-    @Around("@annotation(io.github.loserya.module.transaction.MogoTransaction)")
-    public Object manageTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("execution(* *(..)) && @within(mogoTransaction)")
+    public Object manageTransaction(ProceedingJoinPoint joinPoint, MogoTransaction mogoTransaction) throws Throwable {
 
         if (!MogoEnableCache.transaction) {
             return joinPoint.proceed();

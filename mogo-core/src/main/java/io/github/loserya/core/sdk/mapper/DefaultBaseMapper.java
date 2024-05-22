@@ -104,6 +104,12 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public Page<T> page(LambdaQueryWrapper<T> queryWrapper, int pageNo, int pageSize) {
 
+        return page(queryWrapper, pageNo, (long) pageSize);
+
+    }
+
+    @Override
+    public Page<T> page(LambdaQueryWrapper<T> queryWrapper, long pageNo, long pageSize) {
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
         Page<T> page = new Page<>();
         page.setPageSize(pageSize);
@@ -113,11 +119,10 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
         if (total <= 0) {
             return page;
         }
-        query.skip((long) (pageNo - 1) * pageSize).limit(pageSize);
+        query.skip((pageNo - 1) * pageSize).limit((int) pageSize);
         List<T> list = getTemplate().find(query, targetClass);
         page.setRecords(list);
         return page;
-
     }
 
     @Override
