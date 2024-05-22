@@ -9,9 +9,9 @@ import io.github.loserya.core.wrapper.Wrappers;
 import io.github.loserya.global.BaseMapperContext;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.QueryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     protected BaseMapper<I, T> baseMapper;
 
-    @Resource
+    @Autowired
     protected MogoConfiguration mogoConfiguration;
 
     @Override
