@@ -1,7 +1,9 @@
 package io.github.loser.config;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
@@ -16,16 +18,12 @@ import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
 import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
-import org.springframework.boot.autoconfigure.mongo.MongoClientFactory;
-import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoPropertiesClientSettingsBuilderCustomizer;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,14 +39,9 @@ public class MogoInitializer {
     private final MogoDataSourceProperties mogoDataSourceProperties;
     private final MongoDatabaseFactory mongoDatabaseFactory;
     private final MogoLogicProperties mogoLogicProperties;
-    private final Environment environment;
+    private final MongoConverter mongoConverter;
 
-    protected static void init(
-            Environment environment,
-            MogoLogicProperties mogoLogicProperties,
-            MongoDatabaseFactory mongoDatabaseFactory,
-            MogoDataSourceProperties mogoDataSourceProperties
-    ) {
+    protected static void init(MogoLogicProperties mogoLogicProperties, MongoDatabaseFactory mongoDatabaseFactory, MogoDataSourceProperties mogoDataSourceProperties, MongoConverter mongoConverter) {
         if (Objects.nonNull(initializer)) {
             return;
         }
@@ -56,20 +49,15 @@ public class MogoInitializer {
             if (Objects.nonNull(initializer)) {
                 return;
             }
-            initializer = new MogoInitializer(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
+            initializer = new MogoInitializer(mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties, mongoConverter);
         }
     }
 
-    private MogoInitializer(
-            Environment environment,
-            MogoLogicProperties mogoLogicProperties,
-            MongoDatabaseFactory mongoDatabaseFactory,
-            MogoDataSourceProperties mogoDataSourceProperties
-    ) {
+    private MogoInitializer(MogoLogicProperties mogoLogicProperties, MongoDatabaseFactory mongoDatabaseFactory, MogoDataSourceProperties mogoDataSourceProperties, MongoConverter mongoConverter) {
         this.mogoDataSourceProperties = mogoDataSourceProperties;
         this.mongoDatabaseFactory = mongoDatabaseFactory;
         this.mogoLogicProperties = mogoLogicProperties;
-        this.environment = environment;
+        this.mongoConverter = mongoConverter;
         // 01 初始化逻辑删除
         initLogic();
         // 02 初始化动态数据源
@@ -111,12 +99,7 @@ public class MogoInitializer {
         if (!MogoEnableCache.base) {
             return;
         }
-        MogoConfiguration.instance().idGenStrategy(
-                AutoStrategy.class,
-                SnowStrategy.class,
-                ULIDStrategy.class,
-                UUIDStrategy.class
-        );
+        MogoConfiguration.instance().idGenStrategy(AutoStrategy.class, SnowStrategy.class, ULIDStrategy.class, UUIDStrategy.class);
 
     }
 
@@ -133,7 +116,7 @@ public class MogoInitializer {
             return;
         }
         for (Map.Entry<String, MongoProperties> entry : mogoDataSourceProperties.getDatasource().entrySet()) {
-            MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue());
+            MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue(), mongoConverter);
             MogoConfiguration.instance().template(entry.getKey(), template);
         }
 
@@ -146,28 +129,64 @@ public class MogoInitializer {
         MogoConfiguration.instance().logic(mogoLogicProperties);
     }
 
-    private MongoTemplate buildTemplate(String ds, MongoProperties properties) {
+    private MongoTemplate buildTemplate(String ds, MongoProperties properties, MongoConverter converter) {
 
-        MongoPropertiesClientSettingsBuilderCustomizer customizer = new MongoPropertiesClientSettingsBuilderCustomizer(properties, environment);
-        List<MongoClientSettingsBuilderCustomizer> builderCustomizers = Collections.singletonList(customizer);
-        MongoClientSettings settings = MongoClientSettings.builder().build();
-        MongoClientFactory mongoClientFactory = new MongoClientFactory(builderCustomizers);
-        MongoClient mongoClient = mongoClientFactory.createMongoClient(settings);
-        String db = properties.getDatabase();
-        if (StringUtils.isBlank(db)) {
+        MongoClient mongoClient = MongoClients.create(MongoClientSettings.builder().applyConnectionString(new ConnectionString(new UrlJoint(properties).jointMongoUrl())).build());
+        String database = properties.getDatabase();
+        if (StringUtils.isBlank(database)) {
             String uri = properties.getUri();
             if (StringUtils.isNotBlank(uri)) {
                 String[] split = uri.split("/");
                 if (split.length >= 4) {
-                    db = split[3].split("\\?")[0];
+                    database = split[3].split("\\?")[0];
                 }
             }
         }
-        if (StringUtils.isBlank(db)) {
+        if (StringUtils.isBlank(database)) {
             throw ExceptionUtils.mpe(String.format("dynamic datasource [%s] dataBase is null", ds));
         }
-        return new MongoTemplate(mongoClient, db);
+        SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(mongoClient, database);
+        return new MongoTemplate(factory, converter);
 
     }
 
+    public static class UrlJoint {
+
+        private final MongoProperties mongoProperties;
+
+        public UrlJoint(MongoProperties mongoProperties) {
+            this.mongoProperties = mongoProperties;
+        }
+
+        public String jointMongoUrl() {
+            if (StringUtils.isNotBlank(mongoProperties.getUri())) {
+                return mongoProperties.getUri();
+            }
+            StringBuilder urlBuilder = new StringBuilder("mongodb://");
+
+            // 如果有用户名和密码，则添加认证信息
+            if (mongoProperties.getUsername() != null && !mongoProperties.getUsername().isEmpty()) {
+                urlBuilder.append(mongoProperties.getUsername());
+                if (mongoProperties.getPassword() != null) {
+                    urlBuilder.append(':').append(new String(mongoProperties.getPassword()));
+                }
+                urlBuilder.append('@');
+            }
+
+            // 添加主机和端口
+            urlBuilder.append(mongoProperties.getHost());
+            if (mongoProperties.getPort() != null) {
+                urlBuilder.append(':').append(mongoProperties.getPort());
+            }
+
+            // 添加数据库名称
+            if (mongoProperties.getDatabase() != null && !mongoProperties.getDatabase().isEmpty()) {
+                urlBuilder.append('/').append(mongoProperties.getDatabase());
+            }
+
+            // 返回构建的 URL
+            return urlBuilder.toString();
+        }
+
+    }
 }

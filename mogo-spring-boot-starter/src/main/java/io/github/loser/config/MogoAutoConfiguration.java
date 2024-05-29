@@ -12,19 +12,23 @@ import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.AnnotationUtil;
 import io.github.loserya.utils.CollectionUtils;
+import io.github.loserya.utils.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
+import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 基础必要配置
@@ -65,7 +69,7 @@ public class MogoAutoConfiguration {
     }
 
     public MogoAutoConfiguration(
-            Environment environment,
+            MongoConverter mongoConverter,
             ApplicationContext applicationContext,
             MogoLogicProperties mogoLogicProperties,
             MongoDatabaseFactory mongoDatabaseFactory,
@@ -76,25 +80,39 @@ public class MogoAutoConfiguration {
         // 02 输出启动日志
         logBaseInfo();
         // 03 进行 mogo 初始化操作
-        MogoInitializer.init(environment, mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties);
+        MogoInitializer.init(mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties, mongoConverter);
     }
 
     private static void enableFun(ApplicationContext applicationContext) {
 
-        List<Object> beans = new ArrayList<>(applicationContext.getBeansWithAnnotation(EnableMogo.class).values());
+        Set<String> beans = applicationContext.getBeansWithAnnotation(EnableMogo.class).keySet();
         if (CollectionUtils.isEmpty(beans)) {
             return;
         }
-        Object o = beans.get(0);
-        EnableMogo enableMogo = AnnotationUtil.getAnnotation(o.getClass(), EnableMogo.class);
-        if (Objects.nonNull(enableMogo)) {
-            MogoEnableCache.base = enableMogo.base();
-            MogoEnableCache.logic = enableMogo.logic();
-            MogoEnableCache.autoFill = enableMogo.autoFill();
-            MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
-            MogoEnableCache.banFullTable = enableMogo.banFullTable();
-            MogoEnableCache.transaction = enableMogo.transaction();
-            MogoEnableCache.debugLog = enableMogo.debugLog();
+        for (String bean : beans) {
+            try {
+                BeanDefinition definition = ((BeanDefinitionRegistry) applicationContext).getBeanDefinition(bean);
+                Field declaredField = definition.getClass().getDeclaredField("metadata");
+                declaredField.setAccessible(true);
+                Object metadata = declaredField.get(definition);
+                EnableMogo enableMogo;
+                if (metadata instanceof StandardAnnotationMetadata) {
+                    enableMogo = AnnotationUtil.getAnnotation(((StandardAnnotationMetadata) metadata).getIntrospectedClass(), EnableMogo.class);
+                } else {
+                    enableMogo = AnnotationUtil.getAnnotation(Class.forName(definition.getBeanClassName()), EnableMogo.class);
+                }
+                if (Objects.nonNull(enableMogo)) {
+                    MogoEnableCache.base = enableMogo.base();
+                    MogoEnableCache.logic = enableMogo.logic();
+                    MogoEnableCache.autoFill = enableMogo.autoFill();
+                    MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
+                    MogoEnableCache.banFullTable = enableMogo.banFullTable();
+                    MogoEnableCache.transaction = enableMogo.transaction();
+                    MogoEnableCache.debugLog = enableMogo.debugLog();
+                }
+            } catch (Exception e) {
+                throw ExceptionUtils.mpe("enableMogo @EnableMogo error", e);
+            }
         }
 
     }
@@ -109,7 +127,7 @@ public class MogoAutoConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.3");
+        System.out.println(":: Mogo starting ::           v1.1.4");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");
