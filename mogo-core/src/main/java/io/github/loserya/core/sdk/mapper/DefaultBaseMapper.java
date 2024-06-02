@@ -61,7 +61,17 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     private Update getUpdate(T entity) {
 
         Update update = new Update();
-        for (Field field : entity.getClass().getDeclaredFields()) {
+        Class<?> aClass = entity.getClass();
+        bind(entity, update, aClass);
+        return update;
+
+    }
+
+    private void bind(T entity, Update update, Class<?> aClass) {
+        if (Object.class.equals(aClass)) {
+            return;
+        }
+        for (Field field : aClass.getDeclaredFields()) {
             try {
                 field.setAccessible(true);
                 Object result = field.get(entity);
@@ -71,8 +81,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
             } catch (Exception ignore) {
             }
         }
-        return update;
-
+        bind(entity, update, aClass.getSuperclass());
     }
 
     @Override

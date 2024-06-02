@@ -33,7 +33,9 @@ public class LogicRemoveReplacer implements Replacer {
         Object entity = clazz.newInstance();
         Field field = ClassUtil.getFieldWitchCache(entity.getClass(), result.getFiled());
         field.set(entity, result.getLogicDeleteValue());
-        return newMethod.invoke(target, build(entity, args[0]));
+        LambdaQueryWrapper<?> wrapper = (LambdaQueryWrapper<?>) args[0];
+        wrapper.eq(result.getColumn(), result.getLogicNotDeleteValue());
+        return newMethod.invoke(target, build(entity, wrapper));
 
     }
 
