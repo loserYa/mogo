@@ -89,7 +89,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
         Update update = getUpdate(entity);
-        UpdateResult updateResult = getTemplate().updateFirst(query, update, targetClass);
+        UpdateResult updateResult = getTemplate().updateMulti(query, update, targetClass);
         return updateResult.getModifiedCount() > 0;
 
     }
