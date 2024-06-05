@@ -1,13 +1,40 @@
+/**
+ * MogoConfiguration.java 代码解读
+ * 这段代码是Java编写的，属于一个名为MogoConfiguration的类，这个类实现了ApplicationContextAware接口，用于在Spring框架中管理全局配置。以下是对代码的详细解释：
+ * <p>
+ * 1.类定义和单例模式：MogoConfiguration是一个单例类，它通过一个私有的构造函数和一个静态的实例来保证全局只有一个实例。
+ * <p>
+ * 2.日志记录：使用LogFactory来创建日志记录器，用于记录重要的信息和错误。
+ * <p>
+ * 3.实现ApplicationContextAware接口：通过实现这个接口，MogoConfiguration可以在Spring应用上下文准备好后执行一些初始化操作。
+ * <p>
+ * 4.初始化方法：setApplicationContext方法用于在Spring上下文准备好后进行初始化。它检查是否启用了Mogo，并加载各种处理器和拦截器。
+ * <p>
+ * 5.加载处理器和拦截器：
+ * <p>
+ * 5.1 loadIocInterceptors：加载拦截器。
+ * 5.2 loadIocReplacers：加载替换器。
+ * 5.3 loadIocMeatFilHandlers：加载对象字段填充处理器。
+ * 5.4 loadIocIdGenStrategy：加载ID生成策略处理器。
+ * 5.5 checkMustOneInterceptor：确保某些拦截器只有一个实例。
+ * 6.配置方法：
+ * <p>
+ * 6.1 template和factory方法用于配置MongoTemplate和MongoDatabaseFactory。
+ * 6.2 logic方法用于配置逻辑删除。
+ * 6.3 filedFill、metaObjHandler、replacer、interceptor等方法用于添加各种处理器和拦截器。
+ * 7.异常处理：使用ExceptionUtils来处理异常情况。
+ * <p>
+ * 8.缓存和排序：在添加处理器和拦截器时，会将它们存储在相应的缓存中，并进行排序。
+ * <p>
+ * 9.获取逻辑删除属性：getLogicProperty方法用于获取逻辑删除属性。
+ * <p>
+ * 整体来看，这个类是Mogo框架的核心配置类，负责管理和配置MongoDB相关的操作，如拦截器、替换器、字段填充处理器等。通过这种方式，Mogo框架提供了一种灵活的方式来扩展和定制MongoDB的操作。
+ */
 package io.github.loserya.config;
 
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.function.replacer.Replacer;
-import io.github.loserya.global.cache.IdGenStrategyCache;
-import io.github.loserya.global.cache.InterceptorCache;
-import io.github.loserya.global.cache.MeatObjectCache;
-import io.github.loserya.global.cache.MogoEnableCache;
-import io.github.loserya.global.cache.MongoTemplateCache;
-import io.github.loserya.global.cache.ReplacerCache;
+import io.github.loserya.global.cache.*;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.fill.FieldFillHandler;
 import io.github.loserya.module.fill.MetaObjectHandler;
