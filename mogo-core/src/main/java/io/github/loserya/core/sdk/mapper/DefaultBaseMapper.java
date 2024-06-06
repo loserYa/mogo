@@ -1,3 +1,34 @@
+/**
+ * DefaultBaseMapper.java 代码解读
+ * 这段代码是一个Java类，名为DefaultBaseMapper，它实现了一个名为BaseMapper的接口。这个类的主要功能是提供对MongoDB数据库的基本操作，如查询、保存、删除和更新数据。下面是对这个类的主要方法和功能的详细解释：
+ * <p>
+ * 构造函数:
+ * <p>
+ * public DefaultBaseMapper(Class<T> targetClass): 这个构造函数接受一个泛型参数T的类对象。这个类对象用于指定数据库操作的目标实体类型。
+ * 基本数据库操作方法:
+ * <p>
+ * getOne(LambdaQueryWrapper<T> queryWrapper): 根据提供的查询条件返回单个实体。
+ * save(T entity): 保存一个实体到数据库。
+ * saveBatch(Collection<T> entityList): 批量保存多个实体到数据库。
+ * remove(LambdaQueryWrapper<T> queryWrapper): 根据提供的查询条件删除实体。
+ * update(T entity, LambdaQueryWrapper<T> queryWrapper): 根据提供的查询条件和实体更新数据库中的记录。
+ * count(LambdaQueryWrapper<T> queryWrapper): 计算符合查询条件的记录数。
+ * list(LambdaQueryWrapper<T> queryWrapper): 返回符合查询条件的所有记录。
+ * page(LambdaQueryWrapper<T> queryWrapper, long pageNo, long pageSize): 返回分页后的记录。
+ * exist(LambdaQueryWrapper<T> queryWrapper): 检查符合查询条件的记录是否存在。
+ * 辅助方法: - getUpdate(T entity): 使用反射获取实体中非空字段，并构建一个更新操作。
+ * <p>
+ * bind(T entity, Update update, Class<?> aClass): 递归地绑定实体的字段到更新操作中。
+ * getTemplate(): 获取MongoDB操作的模板对象。
+ * getTragetClass(): 返回目标实体类的Class对象。
+ * 其他:
+ * <p>
+ * 类使用了泛型，允许对不同类型的实体进行操作。
+ * 使用了LambdaQueryWrapper来构建查询条件，这提供了一种灵活的方式来构建复杂的查询。
+ * 使用了Spring Data MongoDB的MongoTemplate来执行实际的数据库操作。
+ * 使用了反射来动态处理实体类的字段，这在更新操作中特别有用。
+ * 总的来说，这个类提供了一个通用的、基于Spring Data MongoDB的数据访问层实现，它抽象了对MongoDB的常见操作，使得开发者可以更方便地进行数据库操作。
+ */
 package io.github.loserya.core.sdk.mapper;
 
 import com.mongodb.client.result.DeleteResult;
@@ -139,7 +170,7 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     }
 
     @Override
-    public Class<T> getTragetClass() {
+    public Class<T> getTargetClass() {
         return targetClass;
     }
 

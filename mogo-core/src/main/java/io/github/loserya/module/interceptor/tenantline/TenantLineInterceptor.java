@@ -1,3 +1,26 @@
+/**
+ * TenantLineInterceptor.java 代码解读
+ * 这段代码是一个Java类，名为TenantLineInterceptor，它实现了一个名为Interceptor的接口。
+ * 这个类的主要功能是在数据库操作中自动添加多租户（Tenant）相关的条件，确保数据操作时能够区分不同租户的数据。这是在多租户架构中常见的一种做法，用于保证数据隔离和安全性。
+ * <p>
+ * 下面是对代码中每个方法的详细解释：
+ * <p>
+ * 抽象方法:
+ * <p>
+ * getTenantId(): 返回当前操作的租户ID。
+ * getTenantIdColumn(): 返回数据库中表示租户ID的列名。
+ * getTenantIdFiled(): 返回实体类中表示租户ID的字段名。
+ * unIgnore(Class<?> clazz): 判断给定的类是否需要应用多租户条件。如果返回true，则对该类应用多租户条件；如果返回false，则不应用。
+ * 覆写的方法:
+ * <p>
+ * getOne, save, saveBatch, remove, update, count, list, page, exist: 这些方法都是对Interceptor接口中定义的方法的实现。
+ * 它们在执行相应的数据库操作之前，会调用addTenantLineCondition方法来添加多租户条件。
+ * 私有方法:
+ * <p>
+ * addTenantLineCondition(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz): 这个方法用于向查询包装器（LambdaQueryWrapper）中添加租户ID的条件。
+ * 如果当前类需要应用多租户条件（即unIgnore返回true），则将租户ID作为条件添加到查询中。
+ * 这个类的设计允许开发者通过继承TenantLineInterceptor并实现其抽象方法，来自定义多租户逻辑。这种方式使得在多租户应用中处理数据时，可以自动地、一致地应用租户隔离逻辑，从而提高代码的可维护性和安全性。
+ */
 package io.github.loserya.module.interceptor.tenantline;
 
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;

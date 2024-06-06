@@ -1,3 +1,39 @@
+/**
+ * LambdaQueryWrapper.java 代码解读
+ * 这段代码是一个Java类，名为LambdaQueryWrapper，它实现了多个接口，用于构建和执行数据库查询。这个类是使用Java 8的lambda表达式和函数式编程特性来简化数据库查询构建过程的。下面是对这段代码的详细解释：
+ * <p>
+ * 类定义：
+ * <p>
+ * LambdaQueryWrapper<T>是一个泛型类，其中T代表实体类的类型。
+ * 它实现了多个接口，包括Compare, ColumnCompare, Func, ColumnFunc, PageFunc, Nested等，这些接口定义了各种数据库操作的方法。
+ * 成员变量：
+ * <p>
+ * fields: 存储选择的字段。
+ * conditions: 存储查询条件。
+ * sortConditions: 存储排序条件。
+ * skip: 用于分页查询的跳过的记录数。
+ * limit: 用于分页查询的限制记录数。
+ * 方法实现：
+ * <p>
+ * appendCondition: 添加另一个LambdaQueryWrapper的条件。
+ * getConditions: 获取当前的查询条件。
+ * conditionsSize: 获取查询条件的数量。
+ * getCondition: 获取当前的条件包装器。
+ * getFieldMeta: 将lambda表达式转换为字段名。
+ * 各种比较方法（如eq, ne, le, lt, ge, gt, between, in, notIn）: 这些方法用于添加不同的查询条件。
+ * or 和 and: 用于组合查询条件。 - orderByAsc 和 orderByDesc: 用于添加排序条件。
+ * skip 和 limit: 用于设置分页参数。
+ * select: 用于选择特定的字段。
+ * 功能：
+ * <p>
+ * 这个类提供了一种流畅的API来构建数据库查询，使得代码更加简洁和易于理解。
+ * 它利用了Java 8的lambda表达式和函数式编程特性，提高了代码的可读性和可维护性。
+ * 通过实现不同的接口，它提供了丰富的方法来构建复杂的查询，包括条件过滤、排序、分页等。
+ * 使用场景：
+ * <p>
+ * 这个类适用于需要构建复杂数据库查询的场景，特别是在使用JPA或类似ORM框架时。 - 它使得构建查询更加直观和灵活，减少了样板代码。
+ * 总的来说，LambdaQueryWrapper类是一个功能强大的工具，用于简化和优化数据库查询构建过程。通过提供一系列流畅的API，它使得编写数据库查询变得更加容易和高效。
+ */
 package io.github.loserya.core.wrapper;
 
 import io.github.loserya.core.entity.Condition;
@@ -12,10 +48,10 @@ import io.github.loserya.core.sdk.base.PageFunc;
 import io.github.loserya.hardcode.constant.ECompare;
 import io.github.loserya.hardcode.constant.EConditionType;
 import io.github.loserya.hardcode.constant.ESortType;
+import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ConvertUtil;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.func.SFunction;
-import io.github.loserya.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

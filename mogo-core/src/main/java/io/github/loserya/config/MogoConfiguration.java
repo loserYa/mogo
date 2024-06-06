@@ -34,7 +34,12 @@ package io.github.loserya.config;
 
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.function.replacer.Replacer;
-import io.github.loserya.global.cache.*;
+import io.github.loserya.global.cache.IdGenStrategyCache;
+import io.github.loserya.global.cache.InterceptorCache;
+import io.github.loserya.global.cache.MeatObjectCache;
+import io.github.loserya.global.cache.MogoEnableCache;
+import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.global.cache.ReplacerCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.fill.FieldFillHandler;
 import io.github.loserya.module.fill.MetaObjectHandler;

@@ -1,3 +1,36 @@
+/**
+ * MetaObjectInterceptor.java 代码解读
+ * 这段代码是一个Java类，名为MetaObjectInterceptor，它实现了一个接口Interceptor。这个类的主要功能是在数据库操作（如保存、更新）之前，对实体对象的字段进行自动填充。下面是对代码的详细解释：
+ * <p>
+ * 类定义和接口实现：
+ * <p>
+ * public class MetaObjectInterceptor implements Interceptor：定义了一个名为MetaObjectInterceptor的公共类，它实现了Interceptor接口。
+ * 方法实现：
+ * <p>
+ * save(Object entity, Class<?> clazz)：在保存单个实体对象之前，调用handleIdGen生成ID，handleFileByAnno根据注解处理字段填充，然后调用handlerMetaObject进行全局字段填充。
+ * saveBatch(Collection<?> entityList, Class<?> clazz)：在批量保存实体对象之前，对每个实体执行与save方法相同的操作。
+ * update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz)：在更新实体对象之前，调用handleFileByAnno处理字段填充，然后调用handlerMetaObject进行全局字段填充。
+ * 私有方法：
+ * <p>
+ * handlerMetaObject(boolean isSave, Object entity, Class<?> clazz)：处理全局的对象字段填充。根据是保存还是更新操作，调用不同的填充处理器。
+ * handleFileByAnno(Object entity, Class<?> clazz, FieldFill... types)：处理单个注解标志的字段填充。根据注解类型，调用相应的处理器填充字段。
+ * listFiledFill(Class<?> clazz)：获取指定类的所有需要填充的字段列表。
+ * listFiledFill(List<FiledFillResult> fields, Class<?> clazz)：递归地获取所有超类的需要填充的字段列表。
+ * handleIdGen(Object entity)：处理实体对象的ID生成。
+ * 注解和反射：
+ * <p>
+ * 代码使用了Java反射和注解来动态地处理字段填充。例如，通过FieldAutoFill注解标记的字段会在保存或更新时被自动填充。
+ * 异常处理：
+ * <p>
+ * 在处理字段填充时，如果遇到异常，代码会抛出运行时异常。
+ * 缓存和效率：
+ * <p>
+ * 代码中使用了MeatObjectCache来缓存处理器和字段信息，以提高效率。
+ * 泛型和集合操作：
+ * <p>
+ * 方法saveBatch和listFiledFill使用了Java的泛型和集合操作来处理多个实体对象和字段。
+ * 总的来说，这个类是一个数据库操作拦截器，用于在实体对象被保存或更新到数据库之前，自动填充其字段。它利用Java反射和注解来实现这一功能，提高了代码的灵活性和可维护性。
+ */
 package io.github.loserya.module.fill;
 
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
@@ -9,8 +42,8 @@ import io.github.loserya.module.fill.entity.FiledMeta;
 import io.github.loserya.module.fill.hardcode.FieldFill;
 import io.github.loserya.module.idgen.IdGenHandler;
 import io.github.loserya.utils.ClassUtil;
-import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.CollectionUtils;
+import io.github.loserya.utils.ExceptionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
