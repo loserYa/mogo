@@ -19,10 +19,10 @@ public abstract class CollectionUtils {
     }
 
     public static boolean isNotEmpty(@Nullable Collection<?> collection) {
-        return !isNotEmpty(collection);
+        return !isEmpty(collection);
     }
 
     public static boolean isNotEmpty(@Nullable Map<?, ?> map) {
-        return !isNotEmpty(map);
+        return !isEmpty(map);
     }
 }
