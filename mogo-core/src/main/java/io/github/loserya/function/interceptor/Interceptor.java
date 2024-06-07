@@ -95,18 +95,27 @@ public interface Interceptor {
      * 通过条件构造器更新数据 只有存在数据的字段才会更新
      *
      * @param entity       需要更新的数据
-     * @param queryWrapper 条件构建起
+     * @param queryWrapper 条件构建器
      * @return 是否更新成功
      */
     default Object[] update(Object entity, LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return build(entity, queryWrapper);
     }
 
+    /**
+     * 通过条件构造器更新数据 只有存在数据的字段才会更新
+     *
+     * @param queryWrapper 条件构建器 + 更新条件
+     * @return 是否更新成功
+     */
+    default Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        return build(queryWrapper);
+    }
 
     /**
-     * 通过条件构建起统计数据量
+     * 通过条件构建器统计数据量
      *
-     * @param queryWrapper 条件构建起
+     * @param queryWrapper 条件构建器
      * @return 数据两
      */
     default Object[] count(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
@@ -114,7 +123,7 @@ public interface Interceptor {
     }
 
     /**
-     * 通过条件构建起查询列表
+     * 通过条件构建器查询列表
      *
      * @param queryWrapper 条件构建器
      * @return 数据集合
@@ -124,7 +133,7 @@ public interface Interceptor {
     }
 
     /**
-     * 通过条件构建起进行分页查询
+     * 通过条件构建器进行分页查询
      *
      * @param queryWrapper 条件构建器
      * @param pageNo       页面

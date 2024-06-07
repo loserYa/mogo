@@ -76,6 +76,12 @@ public abstract class DataPermissionInterceptor implements Interceptor {
     }
 
     @Override
+    public Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        appendCondition(queryWrapper, clazz);
+        return Interceptor.super.lambdaUpdate(queryWrapper, clazz);
+    }
+
+    @Override
     public final Object[] count(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         appendCondition(queryWrapper, clazz);
         return Interceptor.super.count(queryWrapper, clazz);

@@ -152,6 +152,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     }
 
     @Override
+    public boolean update(LambdaQueryWrapper<T> queryWrapper) {
+        return baseMapper.lambdaUpdate(queryWrapper);
+    }
+
+    @Override
     public T getById(I id) {
         return baseMapper.getOne(QueryUtils.buildEq(id, targetClass));
     }

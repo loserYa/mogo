@@ -44,6 +44,7 @@ import io.github.loserya.module.idgen.IdGenHandler;
 import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ExceptionUtils;
+import io.github.loserya.utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -87,6 +88,58 @@ public class MetaObjectInterceptor implements Interceptor {
         handleFileByAnno(entity, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
         handlerMetaObject(false, entity, clazz);
         return Interceptor.super.update(entity, queryWrapper, clazz);
+
+    }
+
+    @Override
+    public Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        handleLambdaByAnno(queryWrapper, clazz, FieldFill.UPDATE, FieldFill.INSERT_UPDATE);
+        handlerLambdaMetaObject(queryWrapper, clazz);
+        return Interceptor.super.lambdaUpdate(queryWrapper, clazz);
+    }
+
+    private void handleLambdaByAnno(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz, FieldFill... types) {
+
+        List<FiledFillResult> fillResults = listFiledFill(clazz);
+        fillResults.stream().filter(item -> {
+                    for (FieldFill type : types) {
+                        if (item.getFieldFill().equals(type)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .forEach(item -> {
+                    Field field = item.getField();
+                    org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
+                    String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
+                    try {
+                        FieldFillHandler<?> handler = MeatObjectCache.HANDLER_MAP.get(item.getHandlerClazz());
+                        if (Objects.nonNull(handler)) {
+                            queryWrapper.set(column, handler.invoke());
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+    }
+
+    private void handlerLambdaMetaObject(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+
+        MeatObjectCache.handlers.forEach(handler -> {
+            FiledMeta filedMeta = handler.updateFill(clazz, new Object());
+            if (Objects.nonNull(filedMeta) && Objects.nonNull(filedMeta.getFiledName()) && Objects.nonNull(filedMeta.getObj())) {
+                try {
+                    Field field = ClassUtil.getFieldWitchCache(clazz, filedMeta.getFiledName());
+                    org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
+                    String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
+                    queryWrapper.set(column, filedMeta.getObj());
+                } catch (Exception e) {
+                    throw ExceptionUtils.mpe(e);
+                }
+            }
+        });
 
     }
 

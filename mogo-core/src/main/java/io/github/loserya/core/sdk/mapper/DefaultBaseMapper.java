@@ -34,8 +34,11 @@ package io.github.loserya.core.sdk.mapper;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import io.github.loserya.core.entity.Page;
+import io.github.loserya.core.entity.UpdateField;
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
 import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.utils.CollectionUtils;
+import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.QueryBuildUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -86,6 +89,54 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
     }
 
+
+    /**
+     * 通过条件构建
+     */
+    private Update getUpdate(LambdaQueryWrapper<?> queryWrapper) {
+
+        Update update = new Update();
+        List<UpdateField> updateFields = queryWrapper.getCondition().getUpdateFields();
+        if (CollectionUtils.isEmpty(updateFields)) {
+            throw ExceptionUtils.mpe("update field is empty");
+        }
+        updateFields.forEach(item -> {
+            switch (item.getType()) {
+                case INCR:
+                    update.inc(item.getCol(), (Number) item.getVal());
+                    break;
+                case DECR:
+                    update.inc(item.getCol(), negate((Number) item.getVal()));
+                    break;
+                default:
+                    update.set(item.getCol(), item.getVal());
+            }
+        });
+        return update;
+
+    }
+
+    /**
+     * 取反
+     */
+    private static Number negate(Number number) {
+        if (number instanceof Integer) {
+            return -number.intValue();
+        } else if (number instanceof Double) {
+            return -number.doubleValue();
+        } else if (number instanceof Float) {
+            return -number.floatValue();
+        } else if (number instanceof Long) {
+            return -number.longValue();
+        } else if (number instanceof Short) {
+            return -number.shortValue();
+        } else if (number instanceof Byte) {
+            return -number.byteValue();
+        } else {
+            throw ExceptionUtils.mpe("Unsupported number type: " + number.getClass());
+        }
+    }
+
     /**
      * 通过反射获取需要更新的字段
      */
@@ -120,6 +171,16 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
         Query query = QueryBuildUtils.buildQuery(queryWrapper);
         Update update = getUpdate(entity);
+        UpdateResult updateResult = getTemplate().updateMulti(query, update, targetClass);
+        return updateResult.getModifiedCount() > 0;
+
+    }
+
+    @Override
+    public boolean lambdaUpdate(LambdaQueryWrapper<T> queryWrapper) {
+
+        Query query = QueryBuildUtils.buildQuery(queryWrapper);
+        Update update = getUpdate(queryWrapper);
         UpdateResult updateResult = getTemplate().updateMulti(query, update, targetClass);
         return updateResult.getModifiedCount() > 0;
 

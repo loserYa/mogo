@@ -114,6 +114,12 @@ public abstract class TenantLineInterceptor implements Interceptor {
     }
 
     @Override
+    public Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        addTenantLineCondition(queryWrapper, clazz);
+        return Interceptor.super.lambdaUpdate(queryWrapper, clazz);
+    }
+
+    @Override
     public final Object[] count(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         addTenantLineCondition(queryWrapper, clazz);
         return Interceptor.super.count(queryWrapper, clazz);

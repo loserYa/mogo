@@ -29,6 +29,7 @@ package io.github.loserya.core.wrapper;
 import io.github.loserya.core.entity.Condition;
 import io.github.loserya.core.entity.SelectField;
 import io.github.loserya.core.entity.SortCondition;
+import io.github.loserya.core.entity.UpdateField;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,10 +42,11 @@ import java.util.List;
  */
 public class ConditionWrapper {
 
-    public ConditionWrapper(List<SelectField> fields, List<Condition> conditions, List<SortCondition> sortConditions, Long skip, Integer limit) {
+    public ConditionWrapper(List<SelectField> fields, List<Condition> conditions, List<SortCondition> sortConditions, List<UpdateField> updateFields, Long skip, Integer limit) {
         this.fields = fields;
         this.conditions = conditions;
         this.sortConditions = sortConditions;
+        this.updateFields = updateFields;
         this.skip = skip;
         this.limit = limit;
     }
@@ -66,6 +68,11 @@ public class ConditionWrapper {
      * 条件构建器排序集合
      */
     private List<SortCondition> sortConditions = Collections.emptyList();
+
+    /**
+     * 需要更新的值
+     */
+    private List<UpdateField> updateFields = Collections.emptyList();
 
     /**
      * 分页 skip
@@ -99,6 +106,14 @@ public class ConditionWrapper {
 
     public void setSortConditions(List<SortCondition> sortConditions) {
         this.sortConditions = sortConditions;
+    }
+
+    public void setUpdateFields(List<UpdateField> updateFields) {
+        this.updateFields = updateFields;
+    }
+
+    public List<UpdateField> getUpdateFields() {
+        return updateFields;
     }
 
     public Long getSkip() {

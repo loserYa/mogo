@@ -8,6 +8,7 @@ public enum ExecuteMethodEnum {
     SAVE_BATCH("saveBatch"),
     REMOVE("remove"),
     UPDATE("update"),
+    LAMBDA_UPDATE("lambdaUpdate"),
     COUNT("count"),
     LIST("list"),
     PAGE("page"),

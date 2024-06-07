@@ -58,4 +58,12 @@ public final class FullTableInterceptor implements Interceptor {
         return build(entity, queryWrapper);
     }
 
+    @Override
+    public Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        if (queryWrapper.conditionsSize() == 0) {
+            throw ExceptionUtils.mpe("update full table refuse!!!");
+        }
+        return build(queryWrapper);
+    }
+
 }

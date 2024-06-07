@@ -26,6 +26,11 @@ public class CollectionLogiceInterceptor implements Interceptor {
     }
 
     @Override
+    public Object[] lambdaUpdate(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
+        return appendLogicCondition(clazz, 0, queryWrapper);
+    }
+
+    @Override
     public Object[] count(LambdaQueryWrapper<?> queryWrapper, Class<?> clazz) {
         return appendLogicCondition(clazz, 0, queryWrapper);
     }

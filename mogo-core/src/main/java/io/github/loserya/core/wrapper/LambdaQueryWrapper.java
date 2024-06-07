@@ -39,15 +39,19 @@ package io.github.loserya.core.wrapper;
 import io.github.loserya.core.entity.Condition;
 import io.github.loserya.core.entity.SelectField;
 import io.github.loserya.core.entity.SortCondition;
+import io.github.loserya.core.entity.UpdateField;
 import io.github.loserya.core.sdk.base.ColumnCompare;
 import io.github.loserya.core.sdk.base.ColumnFunc;
+import io.github.loserya.core.sdk.base.ColumnUpdate;
 import io.github.loserya.core.sdk.base.Compare;
 import io.github.loserya.core.sdk.base.Func;
 import io.github.loserya.core.sdk.base.Nested;
 import io.github.loserya.core.sdk.base.PageFunc;
+import io.github.loserya.core.sdk.base.Update;
 import io.github.loserya.hardcode.constant.ECompare;
 import io.github.loserya.hardcode.constant.EConditionType;
 import io.github.loserya.hardcode.constant.ESortType;
+import io.github.loserya.hardcode.constant.EUpdateType;
 import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ConvertUtil;
 import io.github.loserya.utils.ExceptionUtils;
@@ -71,6 +75,8 @@ import java.util.stream.Collectors;
  */
 public class LambdaQueryWrapper<T>
         implements
+        Update<LambdaQueryWrapper<T>, SFunction<T, ?>>,
+        ColumnUpdate<LambdaQueryWrapper<T>>,
         Compare<LambdaQueryWrapper<T>, SFunction<T, ?>>,
         ColumnCompare<LambdaQueryWrapper<T>>,
         Func<T, LambdaQueryWrapper<T>, SFunction<T, ?>>,
@@ -81,6 +87,7 @@ public class LambdaQueryWrapper<T>
     private final List<SelectField> fields = new ArrayList<>(5);
     private final List<Condition> conditions = new ArrayList<>(5);
     private final List<SortCondition> sortConditions = new ArrayList<>(5);
+    private final List<UpdateField> updateFields = new ArrayList<>(5);
     private Long skip;
     private Integer limit;
 
@@ -102,7 +109,7 @@ public class LambdaQueryWrapper<T>
     }
 
     public ConditionWrapper getCondition() {
-        return new ConditionWrapper(fields, conditions, sortConditions, skip, limit);
+        return new ConditionWrapper(fields, conditions, sortConditions, updateFields, skip, limit);
     }
 
     private String getFieldMeta(SFunction<T, ?> column) {
@@ -230,6 +237,14 @@ public class LambdaQueryWrapper<T>
         return this;
     }
 
+    private void appendUpdateField(SFunction<T, ?> column, Object val, EUpdateType updateType) {
+        appendUpdateField(getFieldMeta(column), val, updateType);
+    }
+
+    private void appendUpdateField(String column, Object val, EUpdateType updateType) {
+        updateFields.add(new UpdateField(column, updateType, val));
+    }
+
     private void appendSortField(SFunction<T, ?> column, ESortType sortType) {
         appendSortField(getFieldMeta(column), sortType);
     }
@@ -335,4 +350,51 @@ public class LambdaQueryWrapper<T>
         return this;
     }
 
+    @Override
+    public LambdaQueryWrapper<T> set(boolean condition, String column, Object val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.SET);
+        }
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapper<T> incr(boolean condition, String column, Number val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.INCR);
+        }
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapper<T> decr(boolean condition, String column, Number val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.DECR);
+        }
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapper<T> set(boolean condition, SFunction<T, ?> column, Object val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.SET);
+        }
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapper<T> incr(boolean condition, SFunction<T, ?> column, Number val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.INCR);
+        }
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapper<T> decr(boolean condition, SFunction<T, ?> column, Number val) {
+        if (condition) {
+            appendUpdateField(column, val, EUpdateType.DECR);
+        }
+        return this;
+    }
 }
