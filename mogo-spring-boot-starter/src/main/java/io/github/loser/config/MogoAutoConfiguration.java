@@ -23,6 +23,8 @@ package io.github.loser.config;
 
 import io.github.loser.aspect.ds.MogoDSClassAspect;
 import io.github.loser.aspect.ds.MogoDSMethodAspect;
+import io.github.loser.aspect.logic.IgnoreLogicClassAspect;
+import io.github.loser.aspect.logic.IgnoreLogicMethodAspect;
 import io.github.loser.aspect.ts.MogoTSClassAspect;
 import io.github.loser.aspect.ts.MogoTSMethodAspect;
 import io.github.loser.properties.MogoDataSourceProperties;
@@ -61,6 +63,16 @@ import java.util.Set;
 public class MogoAutoConfiguration {
 
     private static final Log LOGGER = LogFactory.getLog(MogoAutoConfiguration.class);
+
+    @Bean
+    public IgnoreLogicMethodAspect ignoreLogicMethodAspect() {
+        return new IgnoreLogicMethodAspect();
+    }
+
+    @Bean
+    public IgnoreLogicClassAspect ignoreLogicClassAspect() {
+        return new IgnoreLogicClassAspect();
+    }
 
     @Bean
     public MogoDSClassAspect mogoDSClassAspect() {
@@ -148,7 +160,7 @@ public class MogoAutoConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.4");
+        System.out.println(":: Mogo starting ::           v1.1.5");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");

@@ -22,6 +22,9 @@ public class LogicAutoFillInterceptor implements Interceptor {
     @Override
     public Object[] save(Object entity, Class<?> clazz) {
 
+        if (CollectionLogicDeleteCache.isClose()) {
+            return build(entity);
+        }
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
             return build(entity);
@@ -39,6 +42,9 @@ public class LogicAutoFillInterceptor implements Interceptor {
     @Override
     public Object[] saveBatch(Collection<?> entityList, Class<?> clazz) {
 
+        if (CollectionLogicDeleteCache.isClose()) {
+            return build(entityList);
+        }
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
             return build(entityList);

@@ -47,6 +47,9 @@ public class CollectionLogiceInterceptor implements Interceptor {
 
     private Object[] appendLogicCondition(Class<?> clazz, int index, Object... args) {
 
+        if (CollectionLogicDeleteCache.isClose()) {
+            return args;
+        }
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
             return args;

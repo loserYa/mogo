@@ -4,7 +4,6 @@ package io.github.loserya.module.logic.replacer;
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
 import io.github.loserya.function.replacer.Replacer;
 import io.github.loserya.global.cache.CollectionLogicDeleteCache;
-import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.hardcode.constant.ExecuteMethodEnum;
 import io.github.loserya.module.logic.entity.LogicDeleteResult;
 import io.github.loserya.utils.ClassUtil;
@@ -25,6 +24,9 @@ public class LogicRemoveReplacer implements Replacer {
     @Override
     public Object invoke(Class<?> clazz, Object proxy, Object target, Method method, Object[] args) throws Throwable {
 
+        if (CollectionLogicDeleteCache.isClose()) {
+            return method.invoke(target, args);
+        }
         LogicDeleteResult result = CollectionLogicDeleteCache.getRes(clazz);
         if (Objects.isNull(result)) {
             return method.invoke(target, args);
@@ -41,7 +43,7 @@ public class LogicRemoveReplacer implements Replacer {
 
     @Override
     public BoolFunction supplier() {
-        return (proxy, target, method, args) -> MogoEnableCache.logic && method.getName().equals(ExecuteMethodEnum.REMOVE.getMethod());
+        return (proxy, target, method, args) -> CollectionLogicDeleteCache.IsLogic() && method.getName().equals(ExecuteMethodEnum.REMOVE.getMethod());
     }
 
 }
