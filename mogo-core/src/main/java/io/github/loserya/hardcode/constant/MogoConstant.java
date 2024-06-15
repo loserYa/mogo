@@ -6,6 +6,10 @@ public interface MogoConstant {
 
     String MASTER_DS = "master";
 
+    String BASE_MAPPER = "BaseMapper";
+
+    String MONGO_TEMPLATE = "MongoTemplate";
+
     String LOG_PRE = "====== MOGO ======> ";
 
 }

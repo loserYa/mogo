@@ -31,14 +31,21 @@ import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.core.anno.EnableMogo;
+import io.github.loserya.core.sdk.mapper.BaseMapper;
+import io.github.loserya.global.BaseMapperContext;
 import io.github.loserya.global.cache.MogoEnableCache;
+import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.AnnotationUtil;
+import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ExceptionUtils;
+import io.github.loserya.utils.MogoSpringContextUtils;
+import io.github.loserya.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +56,9 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -92,6 +101,51 @@ public class MogoAutoConfiguration {
     @Bean
     public MogoTSMethodAspect mogoTSMethodAspect() {
         return new MogoTSMethodAspect();
+    }
+
+    /**
+     * 将 mogo 初始化的一些重要对象也交给 spring 管理 用户可以通过别名获取
+     *
+     * @since 1.1.6
+     */
+    @Bean
+    public Object mogoBeanRegister(ConfigurableListableBeanFactory beanFactory) {
+
+        // 01 把 mapper 交给 spring 管理
+        applySpringManageMapper(beanFactory);
+        // 02 把 MongoTemplate 交给 spring 管理
+        applySpringManageMongoTemplate(beanFactory);
+        return new Object();
+
+    }
+
+    private static void applySpringManageMongoTemplate(ConfigurableListableBeanFactory beanFactory) {
+
+        for (Map.Entry<String, MongoTemplate> entry : MongoTemplateCache.CACHE.entrySet()) {
+            String key = entry.getKey();
+            if (!key.equals(MogoConstant.MASTER_DS)) {
+                String beanName = StringUtils.firstToLowerCase(key + MogoConstant.MONGO_TEMPLATE);
+                beanFactory.registerSingleton(beanName, entry.getValue());
+
+            }
+        }
+
+    }
+
+    private static void applySpringManageMapper(ConfigurableListableBeanFactory beanFactory) {
+
+        for (Map.Entry<Class<?>, Class<?>> entry : ClassUtil.MAPPER_CACHE.entrySet()) {
+            String beanName = StringUtils.firstToLowerCase(entry.getValue().getSimpleName() + MogoConstant.BASE_MAPPER);
+            BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(entry.getValue());
+            beanFactory.registerSingleton(beanName, mapper);
+        }
+
+    }
+
+    @Bean
+    @Order(Integer.MIN_VALUE)
+    public MogoSpringContextUtils mogoSpringContextUtils() {
+        return new MogoSpringContextUtils();
     }
 
     @Bean
@@ -160,7 +214,7 @@ public class MogoAutoConfiguration {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.5");
+        System.out.println(":: Mogo starting ::           v1.1.6");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");

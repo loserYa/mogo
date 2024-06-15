@@ -28,7 +28,7 @@ public class ClassUtil {
     /**
      * 缓存目标类上的泛型值
      */
-    private static final Map<Class<?>, Class<?>> CACHE = new HashMap<>(64);
+    public static final Map<Class<?>, Class<?>> MAPPER_CACHE = new HashMap<>(64);
 
     /**
      * 缓存mongo实体的主键字段
@@ -119,12 +119,12 @@ public class ClassUtil {
             return null;
         }
         Class<?> clazz = obj.getClass();
-        Class<?> result = CACHE.get(clazz);
+        Class<?> result = MAPPER_CACHE.get(clazz);
         if (Objects.nonNull(result)) {
             return result;
         }
         result = getGenericClass(obj.getClass(), 1);
-        CACHE.put(clazz, result);
+        MAPPER_CACHE.put(clazz, result);
         return result;
 
     }
