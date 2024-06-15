@@ -45,6 +45,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -283,7 +284,7 @@ public class QueryBuildUtils {
      * @return 构建好的查询条件
      */
     private static Criteria bwHandle(Condition condition) {
-        return Criteria.where(condition.getCol()).lte(condition.getArgs().get(0)).gt(condition.getArgs().get(1));
+        return Criteria.where(condition.getCol()).gte(condition.getArgs().get(0)).lte(condition.getArgs().get(1));
     }
 
     /**
@@ -293,7 +294,7 @@ public class QueryBuildUtils {
      * @return 构建好的查询条件
      */
     private static Criteria inHandle(Condition condition) {
-        List<Object> args = (List<Object>) condition.getArgs().get(0);
+        Collection args = (Collection) condition.getArgs().get(0);
         return Criteria.where(condition.getCol()).in(args.toArray());
     }
 
@@ -304,7 +305,7 @@ public class QueryBuildUtils {
      * @return 构建好的查询条件
      */
     private static Criteria ninHandle(Condition condition) {
-        List<Object> args = (List<Object>) condition.getArgs().get(0);
+        Collection args = (Collection) condition.getArgs().get(0);
         return Criteria.where(condition.getCol()).nin(args.toArray());
     }
 }
