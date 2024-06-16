@@ -218,4 +218,9 @@ public interface MogoService<I extends Serializable, T> {
      */
     boolean existById(I id);
 
+    /**
+     * 获取集合对应的 class
+     */
+    Class<T> getTargetClass();
+
 }

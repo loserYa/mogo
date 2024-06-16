@@ -28,7 +28,7 @@ public class ClassUtil {
     /**
      * 缓存目标类上的泛型值
      */
-    public static final Map<Class<?>, Class<?>> MAPPER_CACHE = new HashMap<>(64);
+    private static final Map<Class<?>, Class<?>> MAPPER_CACHE = new HashMap<>(64);
 
     /**
      * 缓存mongo实体的主键字段

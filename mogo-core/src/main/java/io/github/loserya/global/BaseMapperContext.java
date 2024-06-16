@@ -49,6 +49,10 @@ public class BaseMapperContext {
 
     private final static Map<Class<?>, BaseMapper> mapper = new ConcurrentHashMap<>();
 
+    public static Map<Class<?>, BaseMapper> getMapper() {
+        return mapper;
+    }
+
     public static <I extends Serializable, T> BaseMapper<I, T> getMapper(Class<I> idType, Class<T> clazz) {
         return getMapper(clazz);
     }

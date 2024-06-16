@@ -201,4 +201,8 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
         return baseMapper.exist(QueryUtils.buildEq(id, targetClass));
     }
 
+    @Override
+    public Class<T> getTargetClass() {
+        return targetClass;
+    }
 }

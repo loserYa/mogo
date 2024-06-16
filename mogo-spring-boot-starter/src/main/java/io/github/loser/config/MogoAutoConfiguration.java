@@ -30,39 +30,23 @@ import io.github.loser.aspect.ts.MogoTSMethodAspect;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
-import io.github.loserya.core.anno.EnableMogo;
-import io.github.loserya.core.mapper.CustomerMapperRegister;
 import io.github.loserya.core.sdk.mapper.BaseMapper;
 import io.github.loserya.global.BaseMapperContext;
-import io.github.loserya.global.cache.MogoEnableCache;
-import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.global.cache.MapperCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
-import io.github.loserya.utils.AnnotationUtil;
-import io.github.loserya.utils.ClassUtil;
-import io.github.loserya.utils.CollectionUtils;
-import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.MogoSpringContextUtils;
 import io.github.loserya.utils.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.type.StandardAnnotationMetadata;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * 基础必要配置
@@ -70,11 +54,16 @@ import java.util.Set;
  * @author loser
  * @since 1.0.0
  */
-@Order(Integer.MIN_VALUE)
+@Order(-1)
 @EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
-public class MogoAutoConfiguration {
+public class MogoAutoConfiguration implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-    private static final Log LOGGER = LogFactory.getLog(MogoAutoConfiguration.class);
+    private ConfigurableListableBeanFactory beanFactory;
+    private ApplicationContext applicationContext;
+
+    public MogoAutoConfiguration() {
+        System.out.println(111);
+    }
 
     @Bean
     public IgnoreLogicMethodAspect ignoreLogicMethodAspect() {
@@ -106,181 +95,50 @@ public class MogoAutoConfiguration {
         return new MogoTSMethodAspect();
     }
 
-    /**
-     * 将 mogo 初始化的一些重要对象也交给 spring 管理 用户可以通过别名获取
-     *
-     * @since 1.1.6
-     */
     @Bean
-    @Order(Integer.MIN_VALUE)
-    public Object mogoBeanRegister(ConfigurableListableBeanFactory beanFactory, ApplicationContext applicationContext) {
-
-        // 01 把 mapper 交给 spring 管理
-        applySpringManageMapper(beanFactory);
-        // 02 把 MongoTemplate 交给 spring 管理
-        applySpringManageMongoTemplate(beanFactory);
-        // 03 把用户自定义的mapper 交给 spring 管理
-        applySpringManageCustomMapper(beanFactory, applicationContext);
-
-        return new Object();
-
+    @Order(-1)
+    public MogoSpringContextUtils mogoSpringContextUtils() {
+        return new MogoSpringContextUtils();
     }
 
-    private void applySpringManageCustomMapper(ConfigurableListableBeanFactory beanFactory, ApplicationContext applicationContext) {
-
-        Collection<CustomerMapperRegister> registers = applicationContext.getBeansOfType(CustomerMapperRegister.class).values();
-        if (CollectionUtils.isEmpty(registers)) {
-            return;
-        }
-        for (CustomerMapperRegister register : registers) {
-            Set<Class<?>> classSet = register.register();
-            for (Class<?> customMapperClass : classSet) {
-                String beanName = StringUtils.firstToLowerCase(customMapperClass.getSimpleName() + MogoConstant.BASE_MAPPER);
-                if (!beanFactory.containsBean(beanName)) {
-                    BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(customMapperClass);
-                    beanFactory.registerSingleton(beanName, mapper);
-                }
-            }
-        }
-
+    @Bean
+    @Order(-1)
+    public MogoConfiguration mogoConfiguration(MongoTemplate mongoTemplate) {
+        MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
+        return MogoConfiguration.instance();
     }
 
-    private static void applySpringManageMongoTemplate(ConfigurableListableBeanFactory beanFactory) {
-
-        for (Map.Entry<String, MongoTemplate> entry : MongoTemplateCache.CACHE.entrySet()) {
-            String key = entry.getKey();
-            if (!key.equals(MogoConstant.MASTER_DS)) {
-                String beanName = StringUtils.firstToLowerCase(key + MogoConstant.MONGO_TEMPLATE);
-                if (!beanFactory.containsBean(beanName)) {
-                    beanFactory.registerSingleton(beanName, entry.getValue());
-                }
-
-            }
-        }
-
+    @Bean
+    @Order(-1)
+    public MogoInitializer mogoInitializer(ConfigurableListableBeanFactory beanFactory) {
+        return new MogoInitializer(beanFactory);
     }
 
-    private static void applySpringManageMapper(ConfigurableListableBeanFactory beanFactory) {
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+        // 把生成的 mapper 交给 spring 管理
+        applySpringManageMapper();
+    }
 
-        for (Map.Entry<Class<?>, Class<?>> entry : ClassUtil.MAPPER_CACHE.entrySet()) {
-            String beanName = StringUtils.firstToLowerCase(entry.getValue().getSimpleName() + MogoConstant.BASE_MAPPER);
+    /**
+     * 将带有@MapperProxy的集合实体对应的 baseMapper 注册到容器中
+     */
+    private void applySpringManageMapper() {
+
+        for (Class<?> aClass : MapperCache.MAPPER) {
+            String beanName = StringUtils.firstToLowerCase(aClass.getSimpleName() + MogoConstant.BASE_MAPPER);
             if (!beanFactory.containsBean(beanName)) {
-                BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(entry.getValue());
+                BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(aClass);
                 beanFactory.registerSingleton(beanName, mapper);
             }
         }
 
     }
 
-    @Bean
-    @Order(Integer.MIN_VALUE)
-    public MogoSpringContextUtils mogoSpringContextUtils() {
-        return new MogoSpringContextUtils();
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-
-    @Bean
-    @Order(Integer.MIN_VALUE)
-    public MogoConfiguration mogoConfiguration(MongoTemplate mongoTemplate) {
-        MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
-        return MogoConfiguration.instance();
-    }
-
-    public MogoAutoConfiguration(
-            MongoConverter mongoConverter,
-            ApplicationContext applicationContext,
-            MogoLogicProperties mogoLogicProperties,
-            MongoDatabaseFactory mongoDatabaseFactory,
-            MogoDataSourceProperties mogoDataSourceProperties
-    ) {
-        // 01 开启功能
-        enableFun(applicationContext);
-        // 02 输出启动日志
-        logBaseInfo();
-        // 03 进行 mogo 初始化操作
-        MogoInitializer.init(mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties, mongoConverter);
-    }
-
-    private static void enableFun(ApplicationContext applicationContext) {
-
-        Set<String> beans = applicationContext.getBeansWithAnnotation(EnableMogo.class).keySet();
-        if (CollectionUtils.isEmpty(beans)) {
-            return;
-        }
-        for (String bean : beans) {
-            try {
-                BeanDefinition definition = ((BeanDefinitionRegistry) applicationContext).getBeanDefinition(bean);
-                Field declaredField = definition.getClass().getDeclaredField("metadata");
-                declaredField.setAccessible(true);
-                Object metadata = declaredField.get(definition);
-                EnableMogo enableMogo;
-                if (metadata instanceof StandardAnnotationMetadata) {
-                    enableMogo = AnnotationUtil.getAnnotation(((StandardAnnotationMetadata) metadata).getIntrospectedClass(), EnableMogo.class);
-                } else {
-                    enableMogo = AnnotationUtil.getAnnotation(Class.forName(definition.getBeanClassName()), EnableMogo.class);
-                }
-                if (Objects.nonNull(enableMogo)) {
-                    MogoEnableCache.base = enableMogo.base();
-                    MogoEnableCache.logic = enableMogo.logic();
-                    MogoEnableCache.autoFill = enableMogo.autoFill();
-                    MogoEnableCache.dynamicDs = enableMogo.dynamicDs();
-                    MogoEnableCache.banFullTable = enableMogo.banFullTable();
-                    MogoEnableCache.transaction = enableMogo.transaction();
-                    MogoEnableCache.debugLog = enableMogo.debugLog();
-                }
-            } catch (Exception e) {
-                throw ExceptionUtils.mpe("enableMogo @EnableMogo error", e);
-            }
-        }
-
-    }
-
-    private void logBaseInfo() {
-
-        System.out.println(
-                "  __  __    ____     _____    ____  \n" +
-                        " |  \\/  |  / __ \\   / ____|  / __ \\ \n" +
-                        " | \\  / | | |  | | | |  __  | |  | |\n" +
-                        " | |\\/| | | |  | | | | |_ | | |  | |\n" +
-                        " | |  | | | |__| | | |__| | | |__| |\n" +
-                        " |_|  |_|  \\____/   \\_____|  \\____/"
-        );
-        System.out.println(":: Mogo starting ::           v1.1.6");
-        System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
-        System.out.println(":: doc           ::           https://loser.plus");
-        System.out.println(":: author        ::           loser");
-        System.out.println();
-        if (MogoEnableCache.base) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [base] switch is unEnable");
-        }
-        if (MogoEnableCache.logic) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic] switch is unEnable");
-        }
-        if (MogoEnableCache.autoFill) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [logic autoFill] switch is unEnable");
-        }
-        if (MogoEnableCache.dynamicDs) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [dynamicDs] switch is unEnable");
-        }
-        if (MogoEnableCache.banFullTable) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [banFullTable] switch is unEnable");
-        }
-        if (MogoEnableCache.transaction) {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [transaction] switch is enable");
-        } else {
-            LOGGER.info(MogoConstant.LOG_PRE + "mogo [transaction] switch is unEnable");
-        }
-
-    }
-
 
 }

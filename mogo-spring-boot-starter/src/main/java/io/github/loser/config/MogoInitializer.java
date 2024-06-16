@@ -51,6 +51,8 @@ import com.mongodb.client.MongoClients;
 import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
+import io.github.loserya.global.BaseMapperContext;
+import io.github.loserya.global.cache.CollectionLogicDeleteCache;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
@@ -60,14 +62,24 @@ import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
 import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
 import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
 import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
+import io.github.loserya.module.logic.AnnotationHandler;
+import io.github.loserya.module.logic.CollectionLogic;
+import io.github.loserya.module.logic.entity.ClassAnnotationFiled;
+import io.github.loserya.module.logic.entity.LogicDeleteResult;
+import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
@@ -77,43 +89,15 @@ import java.util.Objects;
  * @author loser
  * @date 2024/5/18
  */
-public class MogoInitializer {
+public class MogoInitializer implements ApplicationContextAware {
 
-    private static MogoInitializer initializer;
-    private final MogoDataSourceProperties mogoDataSourceProperties;
-    private final MongoDatabaseFactory mongoDatabaseFactory;
-    private final MogoLogicProperties mogoLogicProperties;
-    private final MongoConverter mongoConverter;
+    private MogoDataSourceProperties mogoDataSourceProperties;
+    private MongoDatabaseFactory mongoDatabaseFactory;
+    private MogoLogicProperties mogoLogicProperties;
+    private final ConfigurableListableBeanFactory beanFactory;
 
-    protected static void init(MogoLogicProperties mogoLogicProperties, MongoDatabaseFactory mongoDatabaseFactory, MogoDataSourceProperties mogoDataSourceProperties, MongoConverter mongoConverter) {
-        if (Objects.nonNull(initializer)) {
-            return;
-        }
-        synchronized (MogoInitializer.class) {
-            if (Objects.nonNull(initializer)) {
-                return;
-            }
-            initializer = new MogoInitializer(mogoLogicProperties, mongoDatabaseFactory, mogoDataSourceProperties, mongoConverter);
-        }
-    }
-
-    private MogoInitializer(MogoLogicProperties mogoLogicProperties, MongoDatabaseFactory mongoDatabaseFactory, MogoDataSourceProperties mogoDataSourceProperties, MongoConverter mongoConverter) {
-        this.mogoDataSourceProperties = mogoDataSourceProperties;
-        this.mongoDatabaseFactory = mongoDatabaseFactory;
-        this.mogoLogicProperties = mogoLogicProperties;
-        this.mongoConverter = mongoConverter;
-        // 01 初始化逻辑删除
-        initLogic();
-        // 02 初始化动态数据源
-        initDynamicDatasource();
-        // 03 初始化自定填充
-        initMetaFill();
-        // 04 初始化ID生成
-        initIdGenStrategy();
-        // 05 初始化禁止全表跟新及删除
-        initBanFullTable();
-        // 06 初始化事务
-        initTransaction();
+    public MogoInitializer(ConfigurableListableBeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     private void initTransaction() {
@@ -160,8 +144,24 @@ public class MogoInitializer {
             return;
         }
         for (Map.Entry<String, MongoProperties> entry : mogoDataSourceProperties.getDatasource().entrySet()) {
-            MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue(), mongoConverter);
+            MongoTemplate template = buildTemplate(entry.getKey(), entry.getValue(), null);
             MogoConfiguration.instance().template(entry.getKey(), template);
+        }
+        applySpringManageMongoTemplate();
+
+    }
+
+
+    private void applySpringManageMongoTemplate() {
+
+        for (Map.Entry<String, MongoTemplate> entry : MongoTemplateCache.CACHE.entrySet()) {
+            String key = entry.getKey();
+            if (!key.equals(MogoConstant.MASTER_DS)) {
+                String beanName = StringUtils.firstToLowerCase(key + MogoConstant.MONGO_TEMPLATE);
+                if (!beanFactory.containsBean(beanName)) {
+                    beanFactory.registerSingleton(beanName, entry.getValue());
+                }
+            }
         }
 
     }
@@ -171,6 +171,58 @@ public class MogoInitializer {
             return;
         }
         MogoConfiguration.instance().logic(mogoLogicProperties);
+        for (Class<?> clazz : BaseMapperContext.getMapper().keySet()) {
+            mapperLogic(clazz);
+        }
+    }
+
+    /**
+     * 映射实体与逻辑删除字段的关系
+     */
+    public static void mapperLogic(Class<?> clazz) {
+
+        if (!MogoEnableCache.logic) {
+            return;
+        }
+        Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = CollectionLogicDeleteCache.logicDeleteResultHashMap;
+        if (logicDeleteResultHashMap.containsKey(clazz)) {
+            return;
+        }
+        ClassAnnotationFiled<CollectionLogic> targetInfo = AnnotationHandler.getAnnotationOnFiled(clazz, CollectionLogic.class);
+        LogicProperty logicProperty = MogoConfiguration.instance().getLogicProperty();
+        // 优先使用每个对象自定义规则
+        if (Objects.nonNull(targetInfo)) {
+            CollectionLogic annotation = targetInfo.getTargetAnnotation();
+            if (annotation.close()) {
+                logicDeleteResultHashMap.put(clazz, null);
+                return;
+            }
+            LogicDeleteResult result = new LogicDeleteResult();
+            Field field = targetInfo.getField();
+            org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
+            String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
+            result.setFiled(field.getName());
+            result.setColumn(column);
+            result.setLogicDeleteValue(StringUtils.isNotBlank(annotation.delval()) ? annotation.delval() : logicProperty.getLogicDeleteValue());
+            result.setLogicNotDeleteValue(StringUtils.isNotBlank(annotation.value()) ? annotation.value() : logicProperty.getLogicNotDeleteValue());
+            logicDeleteResultHashMap.put(clazz, result);
+            return;
+        }
+
+        // 其次使用全局配置规则
+        if (StringUtils.isNotBlank(logicProperty.getLogicDeleteField())
+                && StringUtils.isNotBlank(logicProperty.getLogicDeleteValue())
+                && StringUtils.isNotBlank(logicProperty.getLogicNotDeleteValue())) {
+            LogicDeleteResult result = new LogicDeleteResult();
+            result.setColumn(logicProperty.getLogicDeleteField());
+            result.setFiled(logicProperty.getLogicDeleteField());
+            result.setLogicDeleteValue(logicProperty.getLogicDeleteValue());
+            result.setLogicNotDeleteValue(logicProperty.getLogicNotDeleteValue());
+            logicDeleteResultHashMap.put(clazz, result);
+            return;
+        }
+        logicDeleteResultHashMap.put(clazz, null);
+
     }
 
     private MongoTemplate buildTemplate(String ds, MongoProperties properties, MongoConverter converter) {
@@ -192,6 +244,25 @@ public class MogoInitializer {
         SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(mongoClient, database);
         return new MongoTemplate(factory, converter);
 
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.mogoDataSourceProperties = applicationContext.getBean(MogoDataSourceProperties.class);
+        this.mongoDatabaseFactory = applicationContext.getBean(MongoDatabaseFactory.class);
+        this.mogoLogicProperties = applicationContext.getBean(MogoLogicProperties.class);
+        // 01 初始化逻辑删除
+        initLogic();
+        // 02 初始化动态数据源
+        initDynamicDatasource();
+        // 03 初始化自定填充
+        initMetaFill();
+        // 04 初始化ID生成
+        initIdGenStrategy();
+        // 05 初始化禁止全表跟新及删除
+        initBanFullTable();
+        // 06 初始化事务
+        initTransaction();
     }
 
     public static class UrlJoint {
