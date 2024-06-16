@@ -69,11 +69,12 @@ import io.github.loserya.module.logic.entity.LogicDeleteResult;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -89,14 +90,24 @@ import java.util.Objects;
  * @author loser
  * @date 2024/5/18
  */
-public class MogoInitializer implements ApplicationContextAware {
+public class MogoInitializer implements BeanPostProcessor {
 
-    private MogoDataSourceProperties mogoDataSourceProperties;
-    private MongoDatabaseFactory mongoDatabaseFactory;
-    private MogoLogicProperties mogoLogicProperties;
+    private static final Log LOGGER = LogFactory.getLog(MogoInitializer.class);
+    private static boolean isInit = false;
+    private final MogoDataSourceProperties mogoDataSourceProperties;
+    private final MongoDatabaseFactory mongoDatabaseFactory;
+    private final MogoLogicProperties mogoLogicProperties;
     private final ConfigurableListableBeanFactory beanFactory;
 
-    public MogoInitializer(ConfigurableListableBeanFactory beanFactory) {
+    public MogoInitializer(
+            MogoDataSourceProperties mogoDataSourceProperties,
+            MongoDatabaseFactory mongoDatabaseFactory,
+            MogoLogicProperties mogoLogicProperties,
+            ConfigurableListableBeanFactory beanFactory
+    ) {
+        this.mogoDataSourceProperties = mogoDataSourceProperties;
+        this.mongoDatabaseFactory = mongoDatabaseFactory;
+        this.mogoLogicProperties = mogoLogicProperties;
         this.beanFactory = beanFactory;
     }
 
@@ -150,7 +161,6 @@ public class MogoInitializer implements ApplicationContextAware {
         applySpringManageMongoTemplate();
 
     }
-
 
     private void applySpringManageMongoTemplate() {
 
@@ -247,22 +257,34 @@ public class MogoInitializer implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.mogoDataSourceProperties = applicationContext.getBean(MogoDataSourceProperties.class);
-        this.mongoDatabaseFactory = applicationContext.getBean(MongoDatabaseFactory.class);
-        this.mogoLogicProperties = applicationContext.getBean(MogoLogicProperties.class);
-        // 01 初始化逻辑删除
-        initLogic();
-        // 02 初始化动态数据源
-        initDynamicDatasource();
-        // 03 初始化自定填充
-        initMetaFill();
-        // 04 初始化ID生成
-        initIdGenStrategy();
-        // 05 初始化禁止全表跟新及删除
-        initBanFullTable();
-        // 06 初始化事务
-        initTransaction();
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+
+        if (isInit) {
+            return bean;
+        }
+        synchronized (MogoInitializer.class) {
+            if (isInit) {
+                return bean;
+            }
+            long start = System.currentTimeMillis();
+            // 01 初始化逻辑删除
+            initLogic();
+            // 02 初始化动态数据源
+            initDynamicDatasource();
+            // 03 初始化自定填充
+            initMetaFill();
+            // 04 初始化ID生成
+            initIdGenStrategy();
+            // 05 初始化禁止全表跟新及删除
+            initBanFullTable();
+            // 06 初始化事务
+            initTransaction();
+            long end = System.currentTimeMillis();
+            isInit = true;
+            LOGGER.info(MogoConstant.LOG_PRE + "mogo init finish cost: " + (end - start));
+        }
+        return bean;
+
     }
 
     public static class UrlJoint {

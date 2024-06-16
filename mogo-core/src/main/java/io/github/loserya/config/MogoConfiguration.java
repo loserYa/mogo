@@ -63,7 +63,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -212,9 +211,6 @@ public class MogoConfiguration implements ApplicationContextAware {
 
         if (!MogoEnableCache.logic) {
             throw ExceptionUtils.mpe("mogo logic is unEnable");
-        }
-        if (Objects.nonNull(this.logicProperty)) {
-            throw ExceptionUtils.mpe("logicProperty is config");
         }
         this.logicProperty = logicProperty;
         this.interceptor(CollectionLogiceInterceptor.class);

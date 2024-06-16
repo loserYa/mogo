@@ -40,8 +40,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -56,14 +54,9 @@ import java.io.Serializable;
  */
 @Order(-1)
 @EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
-public class MogoAutoConfiguration implements BeanFactoryPostProcessor, ApplicationContextAware {
+public class MogoAutoConfiguration implements BeanFactoryPostProcessor {
 
     private ConfigurableListableBeanFactory beanFactory;
-    private ApplicationContext applicationContext;
-
-    public MogoAutoConfiguration() {
-        System.out.println(111);
-    }
 
     @Bean
     public IgnoreLogicMethodAspect ignoreLogicMethodAspect() {
@@ -108,12 +101,6 @@ public class MogoAutoConfiguration implements BeanFactoryPostProcessor, Applicat
         return MogoConfiguration.instance();
     }
 
-    @Bean
-    @Order(-1)
-    public MogoInitializer mogoInitializer(ConfigurableListableBeanFactory beanFactory) {
-        return new MogoInitializer(beanFactory);
-    }
-
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
@@ -134,11 +121,6 @@ public class MogoAutoConfiguration implements BeanFactoryPostProcessor, Applicat
             }
         }
 
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
 }

@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    io.github.loser.config.MogoAutoConfiguration
+    io.github.loser.config.MogoAutoConfiguration,\
+    io.github.loser.config.MogoInitializer
