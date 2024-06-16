@@ -31,6 +31,7 @@ import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.core.anno.EnableMogo;
+import io.github.loserya.core.mapper.CustomerMapperRegister;
 import io.github.loserya.core.sdk.mapper.BaseMapper;
 import io.github.loserya.global.BaseMapperContext;
 import io.github.loserya.global.cache.MogoEnableCache;
@@ -58,6 +59,7 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -68,6 +70,7 @@ import java.util.Set;
  * @author loser
  * @since 1.0.0
  */
+@Order(Integer.MIN_VALUE)
 @EnableConfigurationProperties({MogoLogicProperties.class, MogoDataSourceProperties.class})
 public class MogoAutoConfiguration {
 
@@ -109,13 +112,36 @@ public class MogoAutoConfiguration {
      * @since 1.1.6
      */
     @Bean
-    public Object mogoBeanRegister(ConfigurableListableBeanFactory beanFactory) {
+    @Order(Integer.MIN_VALUE)
+    public Object mogoBeanRegister(ConfigurableListableBeanFactory beanFactory, ApplicationContext applicationContext) {
 
         // 01 把 mapper 交给 spring 管理
         applySpringManageMapper(beanFactory);
         // 02 把 MongoTemplate 交给 spring 管理
         applySpringManageMongoTemplate(beanFactory);
+        // 03 把用户自定义的mapper 交给 spring 管理
+        applySpringManageCustomMapper(beanFactory, applicationContext);
+
         return new Object();
+
+    }
+
+    private void applySpringManageCustomMapper(ConfigurableListableBeanFactory beanFactory, ApplicationContext applicationContext) {
+
+        Collection<CustomerMapperRegister> registers = applicationContext.getBeansOfType(CustomerMapperRegister.class).values();
+        if (CollectionUtils.isEmpty(registers)) {
+            return;
+        }
+        for (CustomerMapperRegister register : registers) {
+            Set<Class<?>> classSet = register.register();
+            for (Class<?> customMapperClass : classSet) {
+                String beanName = StringUtils.firstToLowerCase(customMapperClass.getSimpleName() + MogoConstant.BASE_MAPPER);
+                if (!beanFactory.containsBean(beanName)) {
+                    BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(customMapperClass);
+                    beanFactory.registerSingleton(beanName, mapper);
+                }
+            }
+        }
 
     }
 
@@ -125,7 +151,9 @@ public class MogoAutoConfiguration {
             String key = entry.getKey();
             if (!key.equals(MogoConstant.MASTER_DS)) {
                 String beanName = StringUtils.firstToLowerCase(key + MogoConstant.MONGO_TEMPLATE);
-                beanFactory.registerSingleton(beanName, entry.getValue());
+                if (!beanFactory.containsBean(beanName)) {
+                    beanFactory.registerSingleton(beanName, entry.getValue());
+                }
 
             }
         }
@@ -136,8 +164,10 @@ public class MogoAutoConfiguration {
 
         for (Map.Entry<Class<?>, Class<?>> entry : ClassUtil.MAPPER_CACHE.entrySet()) {
             String beanName = StringUtils.firstToLowerCase(entry.getValue().getSimpleName() + MogoConstant.BASE_MAPPER);
-            BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(entry.getValue());
-            beanFactory.registerSingleton(beanName, mapper);
+            if (!beanFactory.containsBean(beanName)) {
+                BaseMapper<Serializable, ?> mapper = BaseMapperContext.getMapper(entry.getValue());
+                beanFactory.registerSingleton(beanName, mapper);
+            }
         }
 
     }
