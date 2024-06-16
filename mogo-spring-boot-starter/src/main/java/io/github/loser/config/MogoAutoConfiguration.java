@@ -37,6 +37,7 @@ import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.MogoSpringContextUtils;
 import io.github.loserya.utils.StringUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -96,7 +97,7 @@ public class MogoAutoConfiguration implements BeanFactoryPostProcessor {
 
     @Bean
     @Order(-1)
-    public MogoConfiguration mogoConfiguration(MongoTemplate mongoTemplate) {
+    public MogoConfiguration mogoConfiguration(@Qualifier("mongoTemplate") MongoTemplate mongoTemplate) {
         MogoConfiguration.instance().template(MogoConstant.MASTER_DS, mongoTemplate);
         return MogoConfiguration.instance();
     }
