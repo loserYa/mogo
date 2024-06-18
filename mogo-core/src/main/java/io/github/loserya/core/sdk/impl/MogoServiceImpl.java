@@ -132,6 +132,14 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     }
 
     @Override
+    public boolean saveOrUpdateBatch(Collection<T> entityList) {
+        for (T bean : entityList) {
+            saveOrUpdate(bean);
+        }
+        return true;
+    }
+
+    @Override
     public boolean removeById(I id) {
         return baseMapper.remove(QueryUtils.buildEq(id, targetClass));
     }

@@ -103,6 +103,14 @@ public interface MogoService<I extends Serializable, T> {
     boolean saveBatch(Collection<T> entityList);
 
     /**
+     * 批量保存新的数据 内部递归调用单个保存
+     *
+     * @param entityList 需要保存的数据列表
+     * @return 是否保存成功
+     */
+    boolean saveOrUpdateBatch(Collection<T> entityList);
+
+    /**
      * 通过ID删除数据
      *
      * @param id 数据ID
