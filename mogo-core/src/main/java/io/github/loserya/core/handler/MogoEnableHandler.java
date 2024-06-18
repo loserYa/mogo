@@ -44,7 +44,7 @@ public class MogoEnableHandler implements ImportBeanDefinitionRegistrar {
                         " | |  | | | |__| | | |__| | | |__| |\n" +
                         " |_|  |_|  \\____/   \\_____|  \\____/"
         );
-        System.out.println(":: Mogo starting ::           v1.1.6");
+        System.out.println(":: Mogo starting ::           v1.1.7");
         System.out.println(":: gitee         ::           https://gitee.com/lyilan8080/mogo");
         System.out.println(":: doc           ::           https://loser.plus");
         System.out.println(":: author        ::           loser");

@@ -44,6 +44,8 @@
  */
 package io.github.loserya.core.sdk.impl;
 
+import io.github.loserya.utils.ClassUtil;
+
 import java.io.Serializable;
 
 /**
@@ -52,6 +54,12 @@ import java.io.Serializable;
  * @author loser
  * @since 1.0.0
  */
-public abstract class DefaultMogoService<T, I extends Serializable> extends MogoServiceImpl<I, T> {
+public abstract class BaseMogoService<T, I extends Serializable> extends MogoServiceImpl<I, T> {
+
+    @Override
+    @SuppressWarnings("all")
+    public Class<T> buildClass() {
+        return (Class<T>) ClassUtil.getTClass(this, 0);
+    }
 
 }

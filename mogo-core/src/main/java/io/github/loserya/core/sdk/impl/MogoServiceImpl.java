@@ -77,7 +77,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     /**
      * 服务类对应的mongo实体类
      */
-    private final Class<T> targetClass = (Class<T>) ClassUtil.getTClass(this);
+    public final Class<T> targetClass = buildClass();
+
+    public Class<T> buildClass() {
+        return (Class<T>) ClassUtil.getTClass(this, 1);
+    }
 
     protected BaseMapper<I, T> baseMapper;
 
