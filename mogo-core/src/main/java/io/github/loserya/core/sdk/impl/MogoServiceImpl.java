@@ -137,10 +137,14 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
 
     @Override
     public boolean saveOrUpdateBatch(Collection<T> entityList) {
+        boolean res = true;
         for (T bean : entityList) {
-            saveOrUpdate(bean);
+            boolean falg = saveOrUpdate(bean);
+            if (!falg) {
+                res = false;
+            }
         }
-        return true;
+        return res;
     }
 
     @Override
