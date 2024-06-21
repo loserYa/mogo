@@ -113,7 +113,7 @@ public class ClassUtil {
      * @param obj 目标类
      * @return 类名
      */
-    public static Class<?> getTClass(Object obj) {
+    public static Class<?> getTClass(Object obj, int index) {
 
         if (Objects.isNull(obj)) {
             return null;
@@ -123,7 +123,7 @@ public class ClassUtil {
         if (Objects.nonNull(result)) {
             return result;
         }
-        result = getGenericClass(obj.getClass(), 1);
+        result = getGenericClass(obj.getClass(), index);
         MAPPER_CACHE.put(clazz, result);
         return result;
 

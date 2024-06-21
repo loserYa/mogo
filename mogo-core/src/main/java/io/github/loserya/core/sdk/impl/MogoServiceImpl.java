@@ -77,7 +77,11 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     /**
      * 服务类对应的mongo实体类
      */
-    private final Class<T> targetClass = (Class<T>) ClassUtil.getTClass(this);
+    public final Class<T> targetClass = buildClass();
+
+    public Class<T> buildClass() {
+        return (Class<T>) ClassUtil.getTClass(this, 1);
+    }
 
     protected BaseMapper<I, T> baseMapper;
 
@@ -129,6 +133,18 @@ public abstract class MogoServiceImpl<I extends Serializable, T> implements Mogo
     @Override
     public boolean saveBatch(Collection<T> entityList) {
         return baseMapper.saveBatch(entityList);
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(Collection<T> entityList) {
+        boolean res = true;
+        for (T bean : entityList) {
+            boolean falg = saveOrUpdate(bean);
+            if (!falg) {
+                res = false;
+            }
+        }
+        return res;
     }
 
     @Override
