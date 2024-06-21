@@ -1,6 +1,7 @@
 package io.github.loserya.global.cache;
 
 import io.github.loserya.hardcode.constant.MogoConstant;
+import io.github.loserya.module.datasource.MongoDs;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ public class MongoTemplateCache {
 
     private static final Log LOGGER = LogFactory.getLog(MongoTemplateCache.class);
     public static final Map<String, MongoTemplate> CACHE = new HashMap<>();
+    public static final Map<Class<?>, String> ENTITY_DS_CACHE = new HashMap<>();
     public static final Map<String, MongoDatabaseFactory> FACTORY = new HashMap<>();
     public static final Map<String, MongoTransactionManager> MANAGER = new HashMap<>();
 
@@ -46,9 +48,7 @@ public class MongoTemplateCache {
         dataSource.remove();
     }
 
-    public static MongoTemplate getMongoTemplate() {
-
-        String ds = getDataSource();
+    public static MongoTemplate getMongoTemplate(String ds) {
         if (MogoEnableCache.debugLog) {
             LOGGER.info(MogoConstant.LOG_PRE + String.format("getMongoTemplate [%s]", ds));
         }
@@ -57,6 +57,27 @@ public class MongoTemplateCache {
             throw ExceptionUtils.mpe(String.format("ds: %s mongoTemplate un exist", ds));
         }
         return mongoTemplate;
+    }
+
+
+    public static String getEntityDs(Class<?> clazz) {
+
+        String ds = ENTITY_DS_CACHE.get(clazz);
+        if (Objects.nonNull(ds)) {
+            return ds;
+        }
+        MongoDs mongoDs = clazz.getAnnotation(MongoDs.class);
+        if (Objects.nonNull(mongoDs)) {
+            ENTITY_DS_CACHE.put(clazz, mongoDs.value());
+        } else {
+            ENTITY_DS_CACHE.put(clazz, MogoConstant.EMPTY);
+        }
+        return ENTITY_DS_CACHE.get(clazz);
+
+    }
+
+    public static MongoTemplate getMongoTemplate() {
+        return getMongoTemplate(getDataSource());
     }
 
     public static MongoTemplate getMaster() {

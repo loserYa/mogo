@@ -12,4 +12,6 @@ public interface MogoConstant {
 
     String LOG_PRE = "====== MOGO ======> ";
 
+    String EMPTY = "";
+
 }

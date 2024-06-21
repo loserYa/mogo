@@ -40,6 +40,7 @@ import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.QueryBuildUtils;
+import io.github.loserya.utils.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -227,7 +228,13 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
 
     @Override
     public MongoTemplate getTemplate() {
+
+        String ds = MongoTemplateCache.getEntityDs(getTargetClass());
+        if (StringUtils.isNotBlank(ds)) {
+            return MongoTemplateCache.getMongoTemplate(ds);
+        }
         return MongoTemplateCache.getMongoTemplate();
+
     }
 
     @Override
