@@ -24,6 +24,11 @@
             <artifactId>spring-data-mongodb</artifactId>
             <version>3.4.7</version>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.12.20</version>
+        </dependency>
     </dependencies>
 
     <licenses>

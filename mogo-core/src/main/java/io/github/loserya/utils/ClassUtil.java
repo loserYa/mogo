@@ -1,5 +1,6 @@
 package io.github.loserya.utils;
 
+import io.github.loserya.hardcode.constant.MogoConstant;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -123,6 +124,18 @@ public class ClassUtil {
         if (Objects.nonNull(result)) {
             return result;
         }
+
+        // 特殊处理ByteBuddy动态代理类
+        if (clazz.getName().contains(MogoConstant.BYTE_BUDDY)) {
+            for (Map.Entry<Class<?>, Class<?>> entry : MAPPER_CACHE.entrySet()) {
+                if (entry.getKey().isAssignableFrom(clazz)) {
+                    Class<?> value = entry.getValue();
+                    MAPPER_CACHE.put(clazz, value);
+                    return value;
+                }
+            }
+        }
+
         result = getGenericClass(obj.getClass(), index);
         MAPPER_CACHE.put(clazz, result);
         return result;

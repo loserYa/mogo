@@ -4,7 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -85,6 +88,18 @@ public class AnnotationUtil {
             }
         }
         return false;
+
+    }
+
+    public static <T extends Annotation> Map<Method, T> buildByClass(Class<?> aClass, Class<T> anno) {
+
+        Map<Method, T> result = new HashMap<>();
+        T baseAnno = aClass.getAnnotation(anno);
+        for (Method method : aClass.getDeclaredMethods()) {
+            T annotation = method.getAnnotation(anno);
+            result.put(method, Objects.isNull(annotation) ? baseAnno : annotation);
+        }
+        return result;
 
     }
 

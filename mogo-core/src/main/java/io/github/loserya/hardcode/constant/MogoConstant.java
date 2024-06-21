@@ -14,4 +14,6 @@ public interface MogoConstant {
 
     String EMPTY = "";
 
+    String BYTE_BUDDY = "$ByteBuddy$";
+
 }
