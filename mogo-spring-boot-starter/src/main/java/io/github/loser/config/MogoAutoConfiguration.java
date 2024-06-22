@@ -33,6 +33,7 @@ import io.github.loserya.utils.MogoSpringContextUtils;
 import io.github.loserya.utils.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -55,8 +56,8 @@ public class MogoAutoConfiguration implements BeanFactoryPostProcessor {
     private ConfigurableListableBeanFactory beanFactory;
 
     @Bean
-    public MogoBeanProcessor mogoBeanProcessor() {
-        return new MogoBeanProcessor();
+    public MogoBeanProcessor mogoBeanProcessor(AutowireCapableBeanFactory beanFactory) {
+        return new MogoBeanProcessor(beanFactory);
     }
 
     @Bean

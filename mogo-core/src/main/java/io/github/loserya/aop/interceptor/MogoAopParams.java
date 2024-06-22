@@ -7,6 +7,7 @@ import io.github.loserya.module.transaction.MogoTransaction;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * mogo aop 参数
@@ -24,6 +25,12 @@ public class MogoAopParams {
     private MogoTsParams mogoTsParams;
 
     private MogoIgnoreLogicParams mogoIgnoreLogicParams;
+
+    public boolean isNull() {
+        return Objects.isNull(mogoDsParams.getClassAnno()) && mogoDsParams.getMethodMapper().size() == 0
+                && Objects.isNull(mogoTsParams.getClassAnno()) && mogoTsParams.getMethodMapper().size() == 0
+                && Objects.isNull(mogoIgnoreLogicParams.getClassAnno()) && mogoIgnoreLogicParams.getMethodMapper().size() == 0;
+    }
 
     /**
      * 使用构建者 构建复杂对象

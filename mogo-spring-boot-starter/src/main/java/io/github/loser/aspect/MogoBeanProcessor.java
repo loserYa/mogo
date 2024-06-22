@@ -10,9 +10,16 @@ import io.github.loserya.module.logic.IgnoreLogic;
 import io.github.loserya.module.transaction.MogoTransaction;
 import io.github.loserya.utils.AnnotationUtil;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 public class MogoBeanProcessor implements BeanPostProcessor {
+
+    private final AutowireCapableBeanFactory beanFactory;
+
+    public MogoBeanProcessor(AutowireCapableBeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
+    }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -33,8 +40,15 @@ public class MogoBeanProcessor implements BeanPostProcessor {
                 .methodMapperTs(AnnotationUtil.buildByClass(clazz, MogoTransaction.class))
                 .methodMapperIgnore(AnnotationUtil.buildByClass(clazz, IgnoreLogic.class))
                 .build();
-        return ProxyUtil.proxy(bean, new MogoIntercept(mogoAopParams));
+        if (mogoAopParams.isNull()) {
+            return bean;
+        }
+        // 手动走一遍依赖注入
+        Object proxy = ProxyUtil.proxy(bean, new MogoIntercept(mogoAopParams));
+        beanFactory.autowireBean(proxy);
+        return proxy;
 
     }
+
 
 }

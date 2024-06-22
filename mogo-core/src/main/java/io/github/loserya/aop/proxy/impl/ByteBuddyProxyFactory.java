@@ -7,7 +7,7 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
 /**
- * mogo 代理工厂lei
+ * mogo 代理工厂类
  *
  * @author loser
  * @since 1.1.8
@@ -18,12 +18,14 @@ public class ByteBuddyProxyFactory extends ProxyFactory {
     public <T> T proxy(T target, MogoIntercept intercept) {
 
         try {
+            Class<?>[] interfaces = target.getClass().getInterfaces();
+            System.out.println(intercept);
             return (T) new ByteBuddy()
                     .subclass(target.getClass())
                     .method(ElementMatchers.any())
                     .intercept(MethodDelegation.to(intercept))
                     .make()
-                    .load(ByteBuddyProxyFactory.class.getClassLoader())
+                    .load(target.getClass().getClassLoader())
                     .getLoaded()
                     .newInstance();
         } catch (Exception e) {

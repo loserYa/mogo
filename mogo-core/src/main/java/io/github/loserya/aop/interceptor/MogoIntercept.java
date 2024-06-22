@@ -5,6 +5,7 @@ import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.module.datasource.MongoDs;
+import io.github.loserya.utils.ClassUtil;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -32,6 +33,9 @@ public class MogoIntercept {
 
     @RuntimeType
     public Object intercept(@Origin Method method, @SuperCall Callable<?> callable) throws Exception {
+        if (ClassUtil.isObjectMethod(method)) {
+            return callable.call();
+        }
         return doInvokeByDs(method, callable);
     }
 

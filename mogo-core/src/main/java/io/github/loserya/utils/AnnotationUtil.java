@@ -97,7 +97,10 @@ public class AnnotationUtil {
         T baseAnno = aClass.getAnnotation(anno);
         for (Method method : aClass.getDeclaredMethods()) {
             T annotation = method.getAnnotation(anno);
-            result.put(method, Objects.isNull(annotation) ? baseAnno : annotation);
+            T targetAnno = Objects.isNull(annotation) ? baseAnno : annotation;
+            if (Objects.nonNull(targetAnno)) {
+                result.put(method, targetAnno);
+            }
         }
         return result;
 
