@@ -71,11 +71,15 @@ public class MogoIntercept {
         if (!useIgnore) {
             return doByOpenTs(method, callable);
         }
+        boolean ignoreLogic = CollectionLogicDeleteCache.getIgnoreLogic();
         try {
             CollectionLogicDeleteCache.setIgnoreLogic(true);
             return callable.call();
         } finally {
             CollectionLogicDeleteCache.clear();
+            if (ignoreLogic) {
+                CollectionLogicDeleteCache.setIgnoreLogic(true);
+            }
         }
 
     }
