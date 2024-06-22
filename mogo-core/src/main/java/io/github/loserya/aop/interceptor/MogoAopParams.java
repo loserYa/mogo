@@ -26,14 +26,19 @@ public class MogoAopParams {
 
     private MogoIgnoreLogicParams mogoIgnoreLogicParams;
 
-    public boolean isNull() {
+    /**
+     * 是否需要忽略生成代理类
+     */
+    public boolean isIgnore() {
+
         return Objects.isNull(mogoDsParams.getClassAnno()) && mogoDsParams.getMethodMapper().size() == 0
                 && Objects.isNull(mogoTsParams.getClassAnno()) && mogoTsParams.getMethodMapper().size() == 0
                 && Objects.isNull(mogoIgnoreLogicParams.getClassAnno()) && mogoIgnoreLogicParams.getMethodMapper().size() == 0;
+
     }
 
     /**
-     * 使用构建者 构建复杂对象
+     * 私有构造函数、使用构建者 构建复杂对象
      */
     public static class Builder {
 
@@ -157,6 +162,5 @@ public class MogoAopParams {
     public void setMogoIgnoreLogicParams(MogoIgnoreLogicParams mogoIgnoreLogicParams) {
         this.mogoIgnoreLogicParams = mogoIgnoreLogicParams;
     }
-
 
 }

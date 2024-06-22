@@ -59,7 +59,6 @@ public class MongoTemplateCache {
         return mongoTemplate;
     }
 
-
     public static String getEntityDs(Class<?> clazz) {
 
         String ds = ENTITY_DS_CACHE.get(clazz);
@@ -114,7 +113,6 @@ public class MongoTemplateCache {
 
     }
 
-
     public static MongoTransactionManager getManager() {
 
         String ds = getDataSource();
@@ -135,6 +133,5 @@ public class MongoTemplateCache {
         return manager;
 
     }
-
 
 }

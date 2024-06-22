@@ -36,7 +36,9 @@ import com.mongodb.client.result.UpdateResult;
 import io.github.loserya.core.entity.Page;
 import io.github.loserya.core.entity.UpdateField;
 import io.github.loserya.core.wrapper.LambdaQueryWrapper;
+import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
+import io.github.loserya.hardcode.constant.MogoConstant;
 import io.github.loserya.utils.CollectionUtils;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.QueryBuildUtils;
@@ -229,6 +231,9 @@ public class DefaultBaseMapper<I extends Serializable, T> implements BaseMapper<
     @Override
     public MongoTemplate getTemplate() {
 
+        if (!MogoEnableCache.dynamicDs) {
+            return MongoTemplateCache.getMongoTemplate(MogoConstant.MASTER_DS);
+        }
         String ds = MongoTemplateCache.getEntityDs(getTargetClass());
         if (StringUtils.isNotBlank(ds)) {
             return MongoTemplateCache.getMongoTemplate(ds);

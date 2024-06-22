@@ -2,6 +2,7 @@ package io.github.loserya.aop.proxy.impl;
 
 import io.github.loserya.aop.interceptor.MogoIntercept;
 import io.github.loserya.aop.proxy.ProxyFactory;
+import io.github.loserya.utils.ExceptionUtils;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -18,8 +19,6 @@ public class ByteBuddyProxyFactory extends ProxyFactory {
     public <T> T proxy(T target, MogoIntercept intercept) {
 
         try {
-            Class<?>[] interfaces = target.getClass().getInterfaces();
-            System.out.println(intercept);
             return (T) new ByteBuddy()
                     .subclass(target.getClass())
                     .method(ElementMatchers.any())
@@ -29,7 +28,7 @@ public class ByteBuddyProxyFactory extends ProxyFactory {
                     .getLoaded()
                     .newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.mpe(e);
         }
 
     }

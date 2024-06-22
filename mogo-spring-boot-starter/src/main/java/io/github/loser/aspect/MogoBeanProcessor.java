@@ -13,6 +13,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+/**
+ * 判断是否是MogoServiceImpl并生成自定义代理类
+ *
+ * @author loser
+ * @since 1.1.8
+ */
 public class MogoBeanProcessor implements BeanPostProcessor {
 
     private final AutowireCapableBeanFactory beanFactory;
@@ -24,6 +30,7 @@ public class MogoBeanProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
+        // 只针对 MogoServiceImpl 字类实现代理
         if (!(bean instanceof MogoServiceImpl)) {
             return bean;
         }
@@ -40,7 +47,7 @@ public class MogoBeanProcessor implements BeanPostProcessor {
                 .methodMapperTs(AnnotationUtil.buildByClass(clazz, MogoTransaction.class))
                 .methodMapperIgnore(AnnotationUtil.buildByClass(clazz, IgnoreLogic.class))
                 .build();
-        if (mogoAopParams.isNull()) {
+        if (mogoAopParams.isIgnore()) {
             return bean;
         }
         // 手动走一遍依赖注入
@@ -49,6 +56,5 @@ public class MogoBeanProcessor implements BeanPostProcessor {
         return proxy;
 
     }
-
 
 }
