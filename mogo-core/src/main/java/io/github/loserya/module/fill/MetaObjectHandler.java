@@ -2,6 +2,9 @@ package io.github.loserya.module.fill;
 
 import io.github.loserya.module.fill.entity.FiledMeta;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 全局字段填充处理器
  *
@@ -14,8 +17,20 @@ public interface MetaObjectHandler {
         return 1;
     }
 
-    FiledMeta insertFill(Class<?> clazz, Object obj);
+    default FiledMeta insertFill(Class<?> clazz, Object obj) {
+        return null;
+    }
 
-    FiledMeta updateFill(Class<?> clazz, Object obj);
+    default FiledMeta updateFill(Class<?> clazz, Object obj) {
+        return null;
+    }
+
+    default List<FiledMeta> insertFills(Class<?> clazz, Object obj) {
+        return Collections.singletonList(insertFill(clazz, obj));
+    }
+
+    default List<FiledMeta> updateFills(Class<?> clazz, Object obj) {
+        return Collections.singletonList(updateFill(clazz, obj));
+    }
 
 }

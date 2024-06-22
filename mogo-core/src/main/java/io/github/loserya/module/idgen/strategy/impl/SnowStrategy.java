@@ -4,9 +4,7 @@ import io.github.loserya.module.idgen.hardcode.GEN;
 import io.github.loserya.module.idgen.strategy.IdGenStrategy;
 import io.github.loserya.module.idgen.work.IdWorker;
 
-import java.io.Serializable;
-
-public class SnowStrategy implements IdGenStrategy {
+public class SnowStrategy implements IdGenStrategy<Long> {
 
     @Override
     public GEN getType() {
@@ -14,7 +12,7 @@ public class SnowStrategy implements IdGenStrategy {
     }
 
     @Override
-    public Serializable genId(Object obj) {
+    public Long genId(Object obj) {
         return IdWorker.getId();
     }
 

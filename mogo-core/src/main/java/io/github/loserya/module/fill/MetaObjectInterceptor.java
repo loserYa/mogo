@@ -149,18 +149,20 @@ public class MetaObjectInterceptor implements Interceptor {
     private static void handlerMetaObject(boolean isSave, Object entity, Class<?> clazz) {
 
         MeatObjectCache.handlers.forEach(handler -> {
-            FiledMeta filedMeta;
+            List<FiledMeta> metaList;
             if (isSave) {
-                filedMeta = handler.insertFill(clazz, entity);
+                metaList = handler.insertFills(clazz, entity);
             } else {
-                filedMeta = handler.updateFill(clazz, entity);
+                metaList = handler.updateFills(clazz, entity);
             }
-            if (Objects.nonNull(filedMeta) && Objects.nonNull(filedMeta.getFiledName()) && Objects.nonNull(filedMeta.getObj())) {
-                try {
-                    Field field = ClassUtil.getFieldWitchCache(clazz, filedMeta.getFiledName());
-                    field.set(entity, filedMeta.getObj());
-                } catch (Exception e) {
-                    throw ExceptionUtils.mpe(e);
+            for (FiledMeta filedMeta : metaList) {
+                if (Objects.nonNull(filedMeta) && Objects.nonNull(filedMeta.getFiledName()) && Objects.nonNull(filedMeta.getObj())) {
+                    try {
+                        Field field = ClassUtil.getFieldWitchCache(clazz, filedMeta.getFiledName());
+                        field.set(entity, filedMeta.getObj());
+                    } catch (Exception e) {
+                        throw ExceptionUtils.mpe(e);
+                    }
                 }
             }
         });
@@ -185,9 +187,10 @@ public class MetaObjectInterceptor implements Interceptor {
                     Field field = item.getField();
                     try {
                         FieldFillHandler<?> handler = MeatObjectCache.HANDLER_MAP.get(item.getHandlerClazz());
-                        if (Objects.nonNull(handler)) {
-                            field.set(entity, handler.invoke());
+                        if (Objects.isNull(handler)) {
+                            throw ExceptionUtils.mpe("%s is un register in ioc", item.getHandlerClazz().getName());
                         }
+                        field.set(entity, handler.invoke());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

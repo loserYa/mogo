@@ -30,6 +30,7 @@
  */
 package io.github.loserya.global;
 
+import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.core.mapper.factory.MapperFactory;
 import io.github.loserya.core.sdk.mapper.BaseMapper;
 
@@ -63,12 +64,16 @@ public class BaseMapperContext {
         if (Objects.isNull(baseMapper)) {
             synchronized (BaseMapperContext.class) {
                 baseMapper = mapper.get(clazz);
-                if (Objects.nonNull(baseMapper)) {
-                    return baseMapper;
+                try {
+                    if (Objects.nonNull(baseMapper)) {
+                        return baseMapper;
+                    }
+                    BaseMapper handler = MapperFactory.getMapper(clazz);
+                    mapper.put(clazz, handler);
+                    return handler;
+                } finally {
+                    MogoConfiguration.instance().mapperLogic(clazz);
                 }
-                BaseMapper handler = MapperFactory.getMapper(clazz);
-                mapper.put(clazz, handler);
-                return handler;
             }
         }
         return baseMapper;

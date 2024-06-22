@@ -4,10 +4,10 @@ import io.github.loserya.module.idgen.hardcode.GEN;
 
 import java.io.Serializable;
 
-public interface IdGenStrategy {
+public interface IdGenStrategy<T extends Serializable> {
 
     GEN getType();
 
-    Serializable genId(Object obj);
+    T genId(Object obj);
 
 }

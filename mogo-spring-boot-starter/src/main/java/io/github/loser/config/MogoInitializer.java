@@ -52,7 +52,6 @@ import io.github.loser.properties.MogoDataSourceProperties;
 import io.github.loser.properties.MogoLogicProperties;
 import io.github.loserya.config.MogoConfiguration;
 import io.github.loserya.global.BaseMapperContext;
-import io.github.loserya.global.cache.CollectionLogicDeleteCache;
 import io.github.loserya.global.cache.MogoEnableCache;
 import io.github.loserya.global.cache.MongoTemplateCache;
 import io.github.loserya.hardcode.constant.MogoConstant;
@@ -62,11 +61,6 @@ import io.github.loserya.module.idgen.strategy.impl.SnowStrategy;
 import io.github.loserya.module.idgen.strategy.impl.ULIDStrategy;
 import io.github.loserya.module.idgen.strategy.impl.UUIDStrategy;
 import io.github.loserya.module.interceptor.fulltable.FullTableInterceptor;
-import io.github.loserya.module.logic.AnnotationHandler;
-import io.github.loserya.module.logic.CollectionLogic;
-import io.github.loserya.module.logic.entity.ClassAnnotationFiled;
-import io.github.loserya.module.logic.entity.LogicDeleteResult;
-import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.StringUtils;
 import org.apache.commons.logging.Log;
@@ -80,7 +74,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
@@ -182,57 +175,8 @@ public class MogoInitializer implements BeanPostProcessor {
         }
         MogoConfiguration.instance().logic(mogoLogicProperties);
         for (Class<?> clazz : BaseMapperContext.getMapper().keySet()) {
-            mapperLogic(clazz);
+            MogoConfiguration.instance().mapperLogic(clazz);
         }
-    }
-
-    /**
-     * 映射实体与逻辑删除字段的关系
-     */
-    public static void mapperLogic(Class<?> clazz) {
-
-        if (!MogoEnableCache.logic) {
-            return;
-        }
-        Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = CollectionLogicDeleteCache.logicDeleteResultHashMap;
-        if (logicDeleteResultHashMap.containsKey(clazz)) {
-            return;
-        }
-        ClassAnnotationFiled<CollectionLogic> targetInfo = AnnotationHandler.getAnnotationOnFiled(clazz, CollectionLogic.class);
-        LogicProperty logicProperty = MogoConfiguration.instance().getLogicProperty();
-        // 优先使用每个对象自定义规则
-        if (Objects.nonNull(targetInfo)) {
-            CollectionLogic annotation = targetInfo.getTargetAnnotation();
-            if (annotation.close()) {
-                logicDeleteResultHashMap.put(clazz, null);
-                return;
-            }
-            LogicDeleteResult result = new LogicDeleteResult();
-            Field field = targetInfo.getField();
-            org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
-            String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
-            result.setFiled(field.getName());
-            result.setColumn(column);
-            result.setLogicDeleteValue(StringUtils.isNotBlank(annotation.delval()) ? annotation.delval() : logicProperty.getLogicDeleteValue());
-            result.setLogicNotDeleteValue(StringUtils.isNotBlank(annotation.value()) ? annotation.value() : logicProperty.getLogicNotDeleteValue());
-            logicDeleteResultHashMap.put(clazz, result);
-            return;
-        }
-
-        // 其次使用全局配置规则
-        if (StringUtils.isNotBlank(logicProperty.getLogicDeleteField())
-                && StringUtils.isNotBlank(logicProperty.getLogicDeleteValue())
-                && StringUtils.isNotBlank(logicProperty.getLogicNotDeleteValue())) {
-            LogicDeleteResult result = new LogicDeleteResult();
-            result.setColumn(logicProperty.getLogicDeleteField());
-            result.setFiled(logicProperty.getLogicDeleteField());
-            result.setLogicDeleteValue(logicProperty.getLogicDeleteValue());
-            result.setLogicNotDeleteValue(logicProperty.getLogicNotDeleteValue());
-            logicDeleteResultHashMap.put(clazz, result);
-            return;
-        }
-        logicDeleteResultHashMap.put(clazz, null);
-
     }
 
     private MongoTemplate buildTemplate(String ds, MongoProperties properties, MongoConverter converter) {

@@ -10,10 +10,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class AutoStrategy implements IdGenStrategy {
+public class AutoStrategy implements IdGenStrategy<Long> {
 
     @Override
     public GEN getType() {
@@ -21,7 +20,7 @@ public class AutoStrategy implements IdGenStrategy {
     }
 
     @Override
-    public Serializable genId(Object obj) {
+    public Long genId(Object obj) {
 
         MongoTemplate mongoTemplate = MongoTemplateCache.getMongoTemplate();
         String name = obj.getClass().getName();

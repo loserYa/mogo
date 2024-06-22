@@ -34,6 +34,7 @@ package io.github.loserya.config;
 
 import io.github.loserya.function.interceptor.Interceptor;
 import io.github.loserya.function.replacer.Replacer;
+import io.github.loserya.global.cache.CollectionLogicDeleteCache;
 import io.github.loserya.global.cache.IdGenStrategyCache;
 import io.github.loserya.global.cache.InterceptorCache;
 import io.github.loserya.global.cache.MeatObjectCache;
@@ -46,11 +47,16 @@ import io.github.loserya.module.fill.MetaObjectHandler;
 import io.github.loserya.module.idgen.strategy.IdGenStrategy;
 import io.github.loserya.module.interceptor.datapermission.DataPermissionInterceptor;
 import io.github.loserya.module.interceptor.tenantline.TenantLineInterceptor;
+import io.github.loserya.module.logic.AnnotationHandler;
+import io.github.loserya.module.logic.CollectionLogic;
+import io.github.loserya.module.logic.entity.ClassAnnotationFiled;
+import io.github.loserya.module.logic.entity.LogicDeleteResult;
 import io.github.loserya.module.logic.entity.LogicProperty;
 import io.github.loserya.module.logic.interceptor.CollectionLogiceInterceptor;
 import io.github.loserya.module.logic.interceptor.LogicAutoFillInterceptor;
 import io.github.loserya.module.logic.replacer.LogicRemoveReplacer;
 import io.github.loserya.utils.ExceptionUtils;
+import io.github.loserya.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -60,9 +66,12 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -388,4 +397,52 @@ public class MogoConfiguration implements ApplicationContextAware {
         return logicProperty;
     }
 
+    /**
+     * 映射实体与逻辑删除字段的关系
+     */
+    public void mapperLogic(Class<?> clazz) {
+
+        if (!MogoEnableCache.logic) {
+            return;
+        }
+        Map<Class<?>, LogicDeleteResult> logicDeleteResultHashMap = CollectionLogicDeleteCache.logicDeleteResultHashMap;
+        if (logicDeleteResultHashMap.containsKey(clazz)) {
+            return;
+        }
+        ClassAnnotationFiled<CollectionLogic> targetInfo = AnnotationHandler.getAnnotationOnFiled(clazz, CollectionLogic.class);
+        LogicProperty logicProperty = MogoConfiguration.instance().getLogicProperty();
+        // 优先使用每个对象自定义规则
+        if (Objects.nonNull(targetInfo)) {
+            CollectionLogic annotation = targetInfo.getTargetAnnotation();
+            if (annotation.close()) {
+                logicDeleteResultHashMap.put(clazz, null);
+                return;
+            }
+            LogicDeleteResult result = new LogicDeleteResult();
+            Field field = targetInfo.getField();
+            org.springframework.data.mongodb.core.mapping.Field collectionField = field.getAnnotation(org.springframework.data.mongodb.core.mapping.Field.class);
+            String column = Objects.nonNull(collectionField) && StringUtils.isNotBlank(collectionField.value()) ? collectionField.value() : field.getName();
+            result.setFiled(field.getName());
+            result.setColumn(column);
+            result.setLogicDeleteValue(StringUtils.isNotBlank(annotation.delval()) ? annotation.delval() : logicProperty.getLogicDeleteValue());
+            result.setLogicNotDeleteValue(StringUtils.isNotBlank(annotation.value()) ? annotation.value() : logicProperty.getLogicNotDeleteValue());
+            logicDeleteResultHashMap.put(clazz, result);
+            return;
+        }
+
+        // 其次使用全局配置规则
+        if (StringUtils.isNotBlank(logicProperty.getLogicDeleteField())
+                && StringUtils.isNotBlank(logicProperty.getLogicDeleteValue())
+                && StringUtils.isNotBlank(logicProperty.getLogicNotDeleteValue())) {
+            LogicDeleteResult result = new LogicDeleteResult();
+            result.setColumn(logicProperty.getLogicDeleteField());
+            result.setFiled(logicProperty.getLogicDeleteField());
+            result.setLogicDeleteValue(logicProperty.getLogicDeleteValue());
+            result.setLogicNotDeleteValue(logicProperty.getLogicNotDeleteValue());
+            logicDeleteResultHashMap.put(clazz, result);
+            return;
+        }
+        logicDeleteResultHashMap.put(clazz, null);
+
+    }
 }
