@@ -26,6 +26,7 @@
  */
 package io.github.loserya.core.sdk.base;
 
+import io.github.loserya.utils.ExceptionUtils;
 import io.github.loserya.utils.func.SFunction;
 
 import java.io.Serializable;
@@ -53,5 +54,18 @@ public interface PageFunc<T, LambdaQueryWrapper, R extends SFunction<T, ?>> exte
      * @return 当前构建器
      */
     LambdaQueryWrapper limit(Integer limit);
+
+    /**
+     * 分页limit接口
+     *
+     * @param limit 最多取多少条数据 限制不能大于 Integer.MAX_VALUE
+     * @return 当前构建器
+     */
+    default LambdaQueryWrapper limit(Long limit) {
+        if (limit > Integer.MAX_VALUE) {
+            throw ExceptionUtils.mpe("limit is un gt Integer.MAX_VALUE");
+        }
+        return limit(limit.intValue());
+    }
 
 }
