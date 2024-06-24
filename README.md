@@ -1,4 +1,4 @@
-![输入图片说明](mogo.png)
+![输入图片说明](https://gitee.com/lyilan8080/mogo/raw/master/mogo.png)
 
 ### [官网：https://loser.plus](https://loser.plus)
 
